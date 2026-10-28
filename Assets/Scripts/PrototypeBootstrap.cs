@@ -5,7 +5,7 @@ public static class PrototypeBootstrap
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void CreatePrototype()
     {
-        if (Object.FindObjectOfType<PrototypeDirector>() != null) return;
+        if (Object.FindFirstObjectByType<PrototypeDirector>() != null) return;
 
         GameObject cameraObject = new GameObject("Main Camera");
         cameraObject.tag = "MainCamera";

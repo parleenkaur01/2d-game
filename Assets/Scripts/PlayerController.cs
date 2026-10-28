@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        body.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeed, 0f);
+        body.linearVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeed, 0f);
         FindNearbyInteractable();
 
         if (nearbyInteractable != null && (Input.GetKeyDown(KeyCode.E) ||

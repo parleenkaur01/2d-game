@@ -2,6 +2,8 @@
 
 Unity 2D prototype for the individual 2D game project.
 
+Target Unity version: `6000.62f1`.
+
 ## Current vertical slice
 
 The first playable slice is **Floor 1: The Clock Room**. Move through the room, read the clue, activate the clocks in order `III, I, II`, and return to the elevator door.

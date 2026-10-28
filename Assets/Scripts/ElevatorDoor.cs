@@ -18,7 +18,7 @@ public class ElevatorDoor : Interactable
 
         GameState.Instance.OpenDoor();
         GameState.Instance.AddTrust(1);
-        FindObjectOfType<PrototypeDirector>().ShowEnding(
+        Object.FindFirstObjectByType<PrototypeDirector>().ShowEnding(
             "ENDING PREVIEW\nYou trusted the elevator and found a way forward.");
     }
 }
