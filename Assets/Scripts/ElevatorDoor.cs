@@ -2,23 +2,37 @@ using UnityEngine;
 
 public class ElevatorDoor : Interactable
 {
+    private PrototypeDirector director;
+    private int floorNumber;
+
+    public void Configure(PrototypeDirector owner, int floor)
+    {
+        director = owner;
+        floorNumber = floor;
+    }
+
+    private bool IsUnlocked => GameState.Instance != null &&
+        (floorNumber == 1 ? GameState.Instance.ClockPuzzleSolved : GameState.Instance.OfficePuzzleSolved);
+
     public override string GetPrompt()
     {
-        return GameState.Instance != null && GameState.Instance.ClockPuzzleSolved
+        return IsUnlocked
             ? "Return to the elevator" : "The elevator is locked";
     }
 
     public override void Interact(PlayerController player)
     {
-        if (!GameState.Instance.ClockPuzzleSolved)
+        if (!IsUnlocked)
         {
-            FindObjectOfType<PrototypeDirector>().ShowMessage(
-                "The elevator door is locked. Set all three clocks first.", 4f);
+            director.ShowMessage(floorNumber == 1
+                ? "The elevator door is locked. Set all three clocks first."
+                : "The door is locked. Follow the pictures and activate the marked objects.", 4f);
             return;
         }
 
         canInteract = false;
-        GameState.Instance.OpenDoor();
-        FindObjectOfType<PrototypeDirector>().ReturnFromClockRoom(player);
+        if (floorNumber == 1) GameState.Instance.OpenDoor();
+        else GameState.Instance.OpenOfficeDoor();
+        director.ReturnFromFloor(player, floorNumber, transform);
     }
 }

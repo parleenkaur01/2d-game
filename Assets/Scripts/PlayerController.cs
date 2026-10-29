@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D body;
     private Interactable nearbyInteractable;
     private bool movementEnabled = true;
+    private bool officeMovement;
 
     private void Awake()
     {
@@ -21,9 +22,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        body.linearVelocity = movementEnabled
-            ? new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeed, 0f)
-            : Vector2.zero;
+        Vector2 direction = new Vector2(Input.GetAxisRaw("Horizontal"),
+            officeMovement ? Input.GetAxisRaw("Vertical") : 0f);
+        body.linearVelocity = movementEnabled ? direction.normalized * moveSpeed : Vector2.zero;
 
         if (!movementEnabled)
         {
@@ -33,12 +34,38 @@ public class PlayerController : MonoBehaviour
 
         FindNearbyInteractable();
 
+        if (officeMovement && Input.GetMouseButtonDown(0))
+        {
+            Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            foreach (Collider2D hit in Physics2D.OverlapPointAll(point))
+            {
+                Interactable target = hit.GetComponent<Interactable>();
+                if (target == null || !target.canInteract) continue;
+                if (Vector2.Distance(transform.position, target.transform.position) <= interactionDistance)
+                    target.Interact(this);
+                else
+                    FindFirstObjectByType<PrototypeDirector>().ShowMessage("Move closer to that object, then click it.", 3f);
+                return;
+            }
+        }
+
         if (nearbyInteractable != null && (Input.GetKeyDown(KeyCode.E) ||
-            Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow) ||
+            (!officeMovement && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))) ||
             Input.GetKeyDown(KeyCode.Space)))
         {
             nearbyInteractable.Interact(this);
         }
+    }
+
+    public void EnableOfficeMovement() => officeMovement = true;
+
+    private void FixedUpdate()
+    {
+        if (!officeMovement) return;
+        Vector2 position = body.position;
+        position.x = Mathf.Clamp(position.x, -7.2f, 7.2f);
+        position.y = Mathf.Clamp(position.y, -2.2f, 1.4f);
+        body.position = position;
     }
 
     public void SetMovementEnabled(bool enabled)
@@ -73,6 +100,6 @@ public class PlayerController : MonoBehaviour
     {
         if (nearbyInteractable == null) return;
         GUI.Box(new Rect(Screen.width / 2f - 160f, Screen.height - 90f, 320f, 45f),
-            "E / W / Space: " + nearbyInteractable.GetPrompt());
+            (officeMovement ? "Click / E / Space: " : "E / W / Space: ") + nearbyInteractable.GetPrompt());
     }
 }

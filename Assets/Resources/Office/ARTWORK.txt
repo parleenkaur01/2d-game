@@ -1,0 +1,26 @@
+Office object artwork
+Generated using the built-in image_gen tool. These are AI-generated realistic cutouts, not downloaded photographs.
+Files: key.png, table.png, pen.png, chair.png, notebook.png, lamp.png
+All six are stored upright and rotated 180 degrees by Unity at runtime.
+
+Final prompts:
+
+key.png
+Use case: product-mockup. Asset type: standalone cutout sprite for a Unity 2D puzzle game. Subject: A single realistic old brass office key, round bow at the top, long shaft pointing downward and clearly cut teeth at the bottom. Photorealistic materials and natural subtle wear, soft neutral studio lighting, crisp recognizable silhouette, object centered and fills most of frame with 8 percent transparent margin, fully isolated on a genuinely transparent background. Generate the object upright; the game will rotate it 180 degrees. No ground plane, no cast shadow outside object, no text, no labels, no logos, no watermark, no additional props.
+
+table.png
+Use case: product-mockup. Asset type: standalone cutout sprite for a Unity 2D puzzle game. Subject: A single realistic plain wooden office table, upright with rectangular tabletop at the top and four legs pointing down, front three-quarter view, no chair and nothing on the table. Photorealistic materials and natural subtle wear, soft neutral studio lighting, crisp recognizable silhouette, object centered and fills most of frame with 8 percent transparent margin, fully isolated on a genuinely transparent background. Generate the object upright; the game will rotate it 180 degrees. No ground plane, no cast shadow outside object, no text, no labels, no logos, no watermark, no additional props.
+
+pen.png
+Use case: product-mockup. Asset type: standalone cutout sprite for a Unity 2D puzzle game. Subject: A single realistic dark blue fountain pen with silver details, upright with nib pointing downward, entire pen visible. Photorealistic materials and natural subtle wear, soft neutral studio lighting, crisp recognizable silhouette, object centered and fills most of frame with 8 percent transparent margin, fully isolated on a genuinely transparent background. Generate the object upright; the game will rotate it 180 degrees. No ground plane, no cast shadow outside object, no text, no labels, no logos, no watermark, no additional props.
+
+chair.png
+Use case: product-mockup. Asset type: standalone cutout sprite for a Unity 2D puzzle game. Subject: A single realistic wooden office chair with four legs, upright with backrest at the top and legs pointing down, three-quarter front view. No table. Photorealistic materials and natural subtle wear, soft neutral studio lighting, crisp recognizable silhouette, object centered and fills most of frame with 8 percent transparent margin, fully isolated on a genuinely transparent background. Generate the object upright; the game will rotate it 180 degrees. No ground plane, no cast shadow outside object, no text, no labels, no logos, no watermark, no additional props.
+
+notebook.png
+Use case: product-mockup. Asset type: standalone cutout sprite for a Unity 2D puzzle game. Subject: A single realistic closed spiral-bound notebook with a deep red cloth cover, spiral binding on the left, cover facing camera at a slight angle. No writing or logos. Photorealistic materials and natural subtle wear, soft neutral studio lighting, crisp recognizable silhouette, object centered and fills most of frame with 8 percent transparent margin, fully isolated on a genuinely transparent background. Generate the object upright; the game will rotate it 180 degrees. No ground plane, no cast shadow outside object, no text, no labels, no logos, no watermark, no additional props.
+
+lamp.png
+Use case: product-mockup. Asset type: standalone cutout sprite for a Unity 2D puzzle game. Subject: A single realistic vintage green-shaded desk lamp, upright with shade on top and weighted brass base below, full object in three-quarter view, lamp switched on subtly. Photorealistic materials and natural subtle wear, soft neutral studio lighting, crisp recognizable silhouette, object centered and fills most of frame with 8 percent transparent margin, fully isolated on a genuinely transparent background. Generate the object upright; the game will rotate it 180 degrees. No ground plane, no cast shadow outside object, no text, no labels, no logos, no watermark, no additional props.
+
+

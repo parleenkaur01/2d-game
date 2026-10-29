@@ -1,12 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// Creates the opening elevator sounds at runtime so the prototype has audio
+/// Creates the elevator and floor sounds at runtime so the prototype has audio
 /// without depending on uncredited external files.
 /// </summary>
 public class ElevatorAudio : MonoBehaviour
 {
     private AudioSource source;
+    private AudioSource ambienceSource;
     private AudioClip buttonClip;
     private AudioClip motorClip;
     private AudioClip bellClip;
@@ -22,6 +23,11 @@ public class ElevatorAudio : MonoBehaviour
         source.playOnAwake = false;
         source.spatialBlend = 0f;
         source.volume = 0.7f;
+        ambienceSource = gameObject.AddComponent<AudioSource>();
+        ambienceSource.playOnAwake = false;
+        ambienceSource.spatialBlend = 0f;
+        ambienceSource.loop = true;
+        ambienceSource.volume = 0.16f;
 
         buttonClip = CreateTone("Elevator Button", 0.12f, 740f, 0.22f);
         motorClip = CreateRumble("Elevator Motor", 4.5f);
@@ -31,6 +37,7 @@ public class ElevatorAudio : MonoBehaviour
         failureClip = CreateTone("Clock Reset", 0.35f, 170f, 0.2f);
         clueClip = CreateTone("Inspect Note", 0.1f, 520f, 0.13f);
         tickingClip = CreateTone("Clock Tick", 0.035f, 1200f, 0.1f);
+        ambienceSource.clip = CreateTone("Office Electrical Buzz", 2f, 120f, 0.09f);
     }
 
     public void PlayButton() => source.PlayOneShot(buttonClip);
@@ -42,6 +49,8 @@ public class ElevatorAudio : MonoBehaviour
     public void PlayPuzzleSuccess() => source.PlayOneShot(bellClip);
     public void PlayClue() => source.PlayOneShot(clueClip);
     public void PlayClockTick() => source.PlayOneShot(tickingClip, 0.4f);
+    public void StartOfficeAmbience() => ambienceSource.Play();
+    public void StopOfficeAmbience() => ambienceSource.Stop();
 
     private AudioClip CreateTone(string clipName, float length, float frequency, float volume)
     {

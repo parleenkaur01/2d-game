@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Builds the opening elevator and the first playable floor from simple shapes.
+/// Builds the opening elevator and two playable floors from simple shapes.
 /// Authored scenes and artwork can replace these generated rooms later.
 /// </summary>
 public class PrototypeDirector : MonoBehaviour
@@ -10,7 +10,8 @@ public class PrototypeDirector : MonoBehaviour
     private enum RoomPhase
     {
         Elevator,
-        ClockRoom
+        ClockRoom,
+        Office
     }
 
     private GUIStyle titleStyle;
@@ -30,6 +31,8 @@ public class PrototypeDirector : MonoBehaviour
     private string statusMessage;
     private string floorDisplayText = "B3";
     private float statusMessageTimer;
+    private PlayerController officeChoicePlayer;
+    private float officeWarningTimer;
 
     public bool IsTransitioning { get; private set; }
 
@@ -43,7 +46,7 @@ public class PrototypeDirector : MonoBehaviour
         elevatorAudio = gameObject.AddComponent<ElevatorAudio>();
         if (FindObjectOfType<AudioListener>() == null)
             Camera.main.gameObject.AddComponent<AudioListener>();
-        BuildElevatorRoom(false);
+        BuildElevatorRoom(0);
     }
 
     private void Update()
@@ -51,11 +54,24 @@ public class PrototypeDirector : MonoBehaviour
         if (statusMessageTimer > 0f)
             statusMessageTimer -= Time.deltaTime;
 
+        if (officeChoicePlayer != null)
+        {
+            officeWarningTimer -= Time.unscaledDeltaTime;
+            if (Input.GetKeyDown(KeyCode.Alpha1)) ResolveOfficeWarning(true);
+            else if (Input.GetKeyDown(KeyCode.Alpha2)) ResolveOfficeWarning(false);
+            else if (officeWarningTimer <= 0f)
+            {
+                // Dismiss without making a choice on the player's behalf.
+                officeChoicePlayer.SetMovementEnabled(true);
+                officeChoicePlayer = null;
+            }
+        }
+
         if (phase == RoomPhase.Elevator && GameState.Instance != null &&
-            GameState.Instance.DoorOpened && !IsTransitioning && Input.GetKeyDown(KeyCode.R))
+            GameState.Instance.OfficeDoorOpened && !IsTransitioning && Input.GetKeyDown(KeyCode.R))
         {
             GameState.Instance.ResetRun();
-            BuildElevatorRoom(false);
+            BuildElevatorRoom(0);
         }
 
         if (phase == RoomPhase.Elevator && !IsTransitioning && elevatorButtonTransform != null)
@@ -77,11 +93,12 @@ public class PrototypeDirector : MonoBehaviour
         Camera.main.backgroundColor = new Color(0.025f, 0.03f, 0.05f);
     }
 
-    private void BuildElevatorRoom(bool returning)
+    private void BuildElevatorRoom(int completedFloor)
     {
-        BeginRoom(returning ? "Elevator After Floor 1" : "Opening Elevator");
+        BeginRoom(completedFloor == 0 ? "Opening Elevator" : "Elevator After Floor " + completedFloor);
         phase = RoomPhase.Elevator;
-        GameState.Instance.EnterFloor(returning ? 1 : 0);
+        GameState.Instance.EnterFloor(completedFloor);
+        Camera.main.backgroundColor = new Color(0.025f, 0.03f, 0.05f);
 
         CreateBlock("Elevator Back Wall", Vector2.zero, new Vector2(9f, 7f),
             new Color(0.07f, 0.08f, 0.11f), -10, false);
@@ -109,22 +126,22 @@ public class PrototypeDirector : MonoBehaviour
         GameObject floorDisplay = CreateBlock("Floor Display", new Vector2(0f, 2.75f),
             new Vector2(1.35f, 0.5f), new Color(0.3f, 0.06f, 0.05f), -1, false);
         floorDisplayRenderer = floorDisplay.GetComponent<SpriteRenderer>();
-        floorDisplayText = returning ? "1" : "B3";
+        floorDisplayText = completedFloor == 0 ? "B3" : completedFloor.ToString();
         CreateBlock("Control Panel", new Vector2(3.25f, -0.2f), new Vector2(0.9f, 2.1f),
             new Color(0.28f, 0.29f, 0.32f), -1, false);
 
-        if (!returning)
+        if (completedFloor < 2)
         {
             GameObject button = CreateBlock("Illuminated Floor Button", new Vector2(3.25f, 0.15f),
                 new Vector2(0.38f, 0.38f), new Color(0.9f, 0.65f, 0.12f), 1);
             elevatorButtonTransform = button.transform;
             elevatorButtonRenderer = button.GetComponent<SpriteRenderer>();
-            button.AddComponent<ElevatorButton>().Configure(this);
+            button.AddComponent<ElevatorButton>().Configure(this, completedFloor + 1);
         }
         else
         {
             elevatorButtonTransform = null;
-            CreateBlock("Floor One Button", new Vector2(3.25f, 0.15f),
+            CreateBlock("Completed Floor Button", new Vector2(3.25f, 0.15f),
                 new Vector2(0.38f, 0.38f), new Color(0.22f, 0.45f, 0.33f), 1, false);
         }
 
@@ -132,22 +149,24 @@ public class PrototypeDirector : MonoBehaviour
             new Vector2(0.85f, 0.62f), new Color(0.72f, 0.68f, 0.52f), 1);
         warning.AddComponent<ElevatorWarning>().Configure(this);
 
-        CreatePlayer(new Vector2(returning ? 0f : -1.6f, -2.2f), 2.8f);
-        ShowMessage(returning
-            ? "Floor 1 complete. Press R to replay while the next floor is being built."
-            : "The elevator is silent. One button is still glowing.", 6f);
+        CreatePlayer(new Vector2(completedFloor == 0 ? -1.6f : 0f, -2.2f), 2.8f);
+        ShowMessage(completedFloor == 0
+            ? "The elevator is silent. One button is still glowing."
+            : completedFloor == 1
+                ? "Floor 1 complete. Press the glowing button for Floor 2."
+                : "Floor 2 complete. Press R to replay while Floor 3 is being built.", 6f);
     }
 
-    public void BeginFirstFloor(PlayerController player)
+    public void BeginFloor(PlayerController player, int destinationFloor)
     {
-        if (IsTransitioning) return;
+        if (IsTransitioning || destinationFloor < 1 || destinationFloor > 2) return;
 
         IsTransitioning = true;
         player.SetMovementEnabled(false);
-        StartCoroutine(RideToFirstFloor());
+        StartCoroutine(RideToFloor(destinationFloor));
     }
 
-    private IEnumerator RideToFirstFloor()
+    private IEnumerator RideToFloor(int destinationFloor)
     {
         ShowMessage("The doors lock. The elevator begins moving upward...", 10f);
         elevatorAudio.PlayMotor();
@@ -160,10 +179,14 @@ public class PrototypeDirector : MonoBehaviour
             elapsed += Time.deltaTime;
             float progress = elapsed / travelTime;
 
-            if (progress < 0.28f) floorDisplayText = "↑  B2";
-            else if (progress < 0.58f) floorDisplayText = "↑  B1";
-            else if (progress < 0.85f) floorDisplayText = "↑  G";
-            else floorDisplayText = "↑  1";
+            if (destinationFloor == 1)
+            {
+                if (progress < 0.28f) floorDisplayText = "↑  B2";
+                else if (progress < 0.58f) floorDisplayText = "↑  B1";
+                else if (progress < 0.85f) floorDisplayText = "↑  G";
+                else floorDisplayText = "↑  1";
+            }
+            else floorDisplayText = progress < 0.65f ? "↑  1" : "↑  2";
 
             float horizontalShake = Mathf.Sin(elapsed * 27f) * 0.025f;
             float verticalRumble = Mathf.Sin(elapsed * 39f) * 0.07f;
@@ -183,10 +206,10 @@ public class PrototypeDirector : MonoBehaviour
         yield return new WaitForSeconds(0.12f);
         roomRoot.transform.position = restingPosition;
 
-        floorDisplayText = "1";
+        floorDisplayText = destinationFloor.ToString();
         floorDisplayRenderer.color = new Color(0.95f, 0.18f, 0.08f);
         elevatorAudio.PlayBell();
-        ShowMessage("DING — FLOOR 1. The doors are opening.", 3f);
+        ShowMessage("DING — FLOOR " + destinationFloor + ". The doors are opening.", 3f);
         yield return new WaitForSeconds(0.6f);
 
         Vector3 leftClosed = leftElevatorDoor.localPosition;
@@ -209,7 +232,8 @@ public class PrototypeDirector : MonoBehaviour
 
         yield return new WaitForSeconds(0.65f);
 
-        BuildClockRoom();
+        if (destinationFloor == 1) BuildClockRoom();
+        else BuildOfficeRoom();
         IsTransitioning = false;
     }
 
@@ -263,28 +287,177 @@ public class PrototypeDirector : MonoBehaviour
         GameObject door = CreateBlock("Exit Door", new Vector2(6f, -0.8f), new Vector2(2f, 4f),
             new Color(0.22f, 0.25f, 0.38f), -1, false);
         ElevatorDoor elevatorDoor = door.AddComponent<ElevatorDoor>();
-        elevatorDoor.prompt = "Try the elevator";
+        elevatorDoor.Configure(this, 1);
         puzzle.RegisterDoor(door.GetComponent<SpriteRenderer>());
 
         ShowMessage("Three stopped clocks. Read the note on the left to learn their order.", 7f);
     }
 
-    public void ReturnFromClockRoom(PlayerController player)
+    private void BuildOfficeRoom()
+    {
+        BeginRoom("Upside-Down Office");
+        phase = RoomPhase.Office;
+        GameState.Instance.EnterFloor(2);
+        Camera.main.backgroundColor = new Color(0.035f, 0.07f, 0.06f);
+        elevatorAudio.StartOfficeAmbience();
+
+        CreateBlock("Office Back Wall", Vector2.zero, new Vector2(16f, 7f),
+            new Color(0.13f, 0.19f, 0.16f), -10, false);
+        CreateBlock("Office Ceiling", new Vector2(0f, 2.45f), new Vector2(16f, 0.4f),
+            new Color(0.28f, 0.34f, 0.29f), -5, false);
+        CreateBlock("Office Floor", new Vector2(0f, -3.2f), new Vector2(16f, 0.5f),
+            new Color(0.19f, 0.24f, 0.2f), -5);
+        CreateBlock("Fluorescent Light", new Vector2(0f, 2.15f), new Vector2(2.8f, 0.12f),
+            new Color(0.69f, 0.82f, 0.62f), -2, false);
+
+        // A single recognizable upside-down table is the puzzle's furniture target.
+        CreateBlock("Floating Paper Left", new Vector2(-4.3f, 0.35f), new Vector2(0.5f, 0.7f),
+            new Color(0.68f, 0.69f, 0.53f), -1, false);
+        CreateBlock("Floating Paper Right", new Vector2(3.8f, 0.7f), new Vector2(0.55f, 0.65f),
+            new Color(0.68f, 0.69f, 0.53f), -1, false);
+
+        CreatePlayer(new Vector2(-6.1f, -2.2f), 1.8f).EnableOfficeMovement();
+
+        CreateBlock("File Board", new Vector2(-6.15f, -0.65f), new Vector2(1.5f, 1.25f),
+            new Color(0.26f, 0.28f, 0.22f), -1, false);
+        GameObject clue = CreateBlock("Office Desk File", new Vector2(-6.15f, -0.65f),
+            new Vector2(1.1f, 0.85f), new Color(0.76f, 0.75f, 0.57f), 1, false);
+        MakeOfficeClickable(clue);
+
+        GameObject warning = CreateBlock("Office Warning", new Vector2(-4.35f, -0.65f),
+            new Vector2(0.85f, 0.85f), new Color(0.72f, 0.36f, 0.24f), 1, false);
+        warning.AddComponent<OfficeWarning>().Configure(this);
+        MakeOfficeClickable(warning);
+
+        GameObject hintBoard = new GameObject("Picture Hint");
+        hintBoard.transform.SetParent(roomRoot.transform, false);
+        GameObject hintPaper = CreateBlock("Picture Strip", new Vector2(-5.4f, 0.95f),
+            new Vector2(3.5f, 0.95f), new Color(0.8f, 0.79f, 0.62f), 1, false);
+        hintPaper.transform.SetParent(hintBoard.transform, true);
+        for (int step = 0; step < OfficePuzzle.PictureOrder.Length; step++)
+        {
+            CreateOfficePicture(hintBoard.transform, OfficePuzzle.PictureOrder[step],
+                new Vector3(-6.4f + step, 0.95f, 0f), 0.7f);
+            if (step < 2)
+            {
+                float x = -5.9f + step;
+                CreateGlyphStroke(hintBoard.transform, new Vector2(x, 1f), new Vector2(0.05f, 0.18f), 45f);
+                CreateGlyphStroke(hintBoard.transform, new Vector2(x, 0.9f), new Vector2(0.05f, 0.18f), -45f);
+            }
+        }
+        hintBoard.SetActive(false);
+
+        GameObject puzzleObject = new GameObject("Office Button Puzzle");
+        puzzleObject.transform.SetParent(roomRoot.transform);
+        OfficePuzzle puzzle = puzzleObject.AddComponent<OfficePuzzle>();
+        puzzle.Configure(this, warning.transform, hintBoard);
+        clue.AddComponent<OfficeClue>().Configure(this, puzzle);
+
+        Vector2[] objectPositions = {
+            new Vector2(-1.9f, -1.5f), new Vector2(0.8f, 1f), new Vector2(3.6f, -1.5f),
+            new Vector2(-2.8f, 0.4f), new Vector2(0.3f, -1.8f), new Vector2(4.1f, 0.95f)
+        };
+        float[] objectSizes = { 1.4f, 3.2f, 1.7f, 1.8f, 1.1f, 1.8f };
+        for (int i = 0; i < objectPositions.Length; i++)
+        {
+            Vector2 position = objectPositions[i];
+            GameObject button = CreateOfficePicture(roomRoot.transform, i, position, objectSizes[i]);
+            OfficeButton officeButton = button.AddComponent<OfficeButton>();
+            officeButton.Configure(puzzle, i);
+            MakeOfficeClickable(button);
+            // Thin items such as the pen get a comfortable mouse target.
+            BoxCollider2D clickArea = button.GetComponent<BoxCollider2D>();
+            Vector2 clickSize = clickArea.size;
+            clickSize.x = Mathf.Max(clickSize.x, 0.65f / button.transform.localScale.x);
+            clickArea.size = clickSize;
+            puzzle.RegisterButton(i, officeButton);
+        }
+
+        CreateBlock("Office Door Frame", new Vector2(6.1f, -0.8f), new Vector2(2.4f, 4.4f),
+            new Color(0.41f, 0.48f, 0.35f), -2, false);
+        GameObject door = CreateBlock("Office Elevator Door", new Vector2(6f, -0.8f),
+            new Vector2(2f, 4f), new Color(0.22f, 0.31f, 0.29f), -1, false);
+        door.AddComponent<ElevatorDoor>().Configure(this, 2);
+        MakeOfficeClickable(door);
+        puzzle.RegisterDoor(door.GetComponent<SpriteRenderer>());
+
+        ShowMessage("The office is upside down. Move with WASD or arrows. Click the paper on the left for a hint.", 8f);
+    }
+
+    private void MakeOfficeClickable(GameObject target)
+    {
+        target.AddComponent<BoxCollider2D>().isTrigger = true;
+    }
+
+    private GameObject CreateOfficePicture(Transform parent, int index, Vector3 position,
+        float maximumSize)
+    {
+        string[] filenames = { "key", "table", "pen", "chair", "notebook", "lamp" };
+        Texture2D texture = Resources.Load<Texture2D>("Office/" + filenames[index]);
+        GameObject picture = new GameObject("Upside-Down " + filenames[index]);
+        picture.transform.SetParent(parent, false);
+        picture.transform.localPosition = position;
+        picture.transform.localRotation = Quaternion.Euler(0f, 0f, 180f);
+        SpriteRenderer renderer = picture.AddComponent<SpriteRenderer>();
+        renderer.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
+            new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
+        renderer.sortingOrder = 3;
+        picture.transform.localScale = Vector3.one *
+            (maximumSize * 100f / Mathf.Max(texture.width, texture.height));
+        return picture;
+    }
+
+    private void CreateGlyphStroke(Transform parent, Vector2 position, Vector2 size, float angle = 0f)
+    {
+        Transform stroke = CreateBlock("Mark Stroke", Vector2.zero, size,
+            new Color(0.1f, 0.16f, 0.13f), 3, false).transform;
+        stroke.SetParent(parent, false);
+        stroke.localPosition = position;
+        stroke.localRotation = Quaternion.Euler(0f, 0f, angle);
+    }
+
+    public void PresentOfficeWarning(PlayerController player)
+    {
+        if (officeChoicePlayer != null || GameState.Instance.AnsweredOfficeWarning)
+        {
+            ShowMessage(GameState.Instance.TrustedOfficeWarning
+                ? "You chose to trust the office warning."
+                : "You chose to ignore the office warning.", 3f);
+            return;
+        }
+
+        officeChoicePlayer = player;
+        officeWarningTimer = 3f;
+        player.SetMovementEnabled(false);
+        PlayClueSound();
+    }
+
+    private void ResolveOfficeWarning(bool trust)
+    {
+        if (officeChoicePlayer == null) return;
+
+        GameState.Instance.AnswerOfficeWarning(trust);
+        officeChoicePlayer.SetMovementEnabled(true);
+        officeChoicePlayer = null;
+        ShowMessage(trust
+            ? "You decide to trust the warning. The elevator may be hiding something."
+            : "You ignore the warning and focus on the office puzzle.", 3f);
+    }
+
+    public void ReturnFromFloor(PlayerController player, int floorNumber, Transform door)
     {
         if (IsTransitioning) return;
 
         IsTransitioning = true;
         player.SetMovementEnabled(false);
-        StartCoroutine(LeaveClockRoom());
+        StartCoroutine(LeaveFloor(floorNumber, door));
     }
 
-    private IEnumerator LeaveClockRoom()
+    private IEnumerator LeaveFloor(int floorNumber, Transform doorTransform)
     {
         ShowMessage("The unlocked elevator door opens. You step back inside.", 3f);
         elevatorAudio.PlayDoors();
 
-        ElevatorDoor door = FindObjectOfType<ElevatorDoor>();
-        Transform doorTransform = door.transform;
         Vector3 closedScale = doorTransform.localScale;
         float elapsed = 0f;
         while (elapsed < 1.1f)
@@ -297,7 +470,8 @@ public class PrototypeDirector : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.5f);
-        BuildElevatorRoom(true);
+        elevatorAudio.StopOfficeAmbience();
+        BuildElevatorRoom(floorNumber);
         IsTransitioning = false;
     }
 
@@ -307,11 +481,13 @@ public class PrototypeDirector : MonoBehaviour
         roomRoot = new GameObject(roomName);
     }
 
-    private void CreatePlayer(Vector2 position, float interactionRange)
+    private PlayerController CreatePlayer(Vector2 position, float interactionRange)
     {
         GameObject playerObject = CreateBlock("Player", position, new Vector2(0.8f, 1.5f),
             new Color(0.8f, 0.75f, 0.55f), 10);
-        playerObject.AddComponent<PlayerController>().SetInteractionDistance(interactionRange);
+        PlayerController controller = playerObject.AddComponent<PlayerController>();
+        controller.SetInteractionDistance(interactionRange);
+        return controller;
     }
 
     private GameObject CreateBlock(string objectName, Vector2 position, Vector2 size,
@@ -387,9 +563,12 @@ public class PrototypeDirector : MonoBehaviour
         GUI.Label(new Rect(0f, 15f, Screen.width, 40f), "THE LAST ELEVATOR", titleStyle);
 
         string subtitle = phase == RoomPhase.Elevator
-            ? (GameState.Instance != null && GameState.Instance.DoorOpened
-                ? "Elevator — Floor 1 Complete" : "Inside the Elevator")
-            : "Floor 1: The Clock Room";
+            ? (GameState.Instance != null && GameState.Instance.OfficeDoorOpened
+                ? "Elevator — Floor 2 Complete"
+                : GameState.Instance != null && GameState.Instance.DoorOpened
+                    ? "Elevator — Floor 1 Complete" : "Inside the Elevator")
+            : phase == RoomPhase.ClockRoom ? "Floor 1: The Clock Room"
+                : "Floor 2: The Upside-Down Office";
         GUI.Label(new Rect(0f, 55f, Screen.width, 35f), subtitle, bodyStyle);
 
         if (phase == RoomPhase.Elevator)
@@ -405,8 +584,24 @@ public class PrototypeDirector : MonoBehaviour
 
         GUI.Label(new Rect(0f, Screen.height - 45f, Screen.width, 30f),
             phase == RoomPhase.Elevator && GameState.Instance != null &&
-            GameState.Instance.DoorOpened
-                ? "Floor 1 complete   R: replay from the beginning"
-                : "A/D or arrows: move   E/W/Space: interact", bodyStyle);
+            GameState.Instance.OfficeDoorOpened
+                ? "Floor 2 complete   R: replay from the beginning"
+                : phase == RoomPhase.Office
+                    ? "WASD / arrows: move   Mouse click / E / Space: interact"
+                    : "A/D or arrows: move   E/W/Space: interact", bodyStyle);
+
+        if (officeChoicePlayer != null)
+        {
+            float left = Screen.width / 2f - 255f;
+            float top = Screen.height / 2f - 100f;
+            GUI.Box(new Rect(left, top, 510f, 200f), "OFFICE WARNING");
+            GUI.Label(new Rect(left + 30f, top + 35f, 450f, 65f),
+                "The note says: DO NOT TRUST THE ELEVATOR DISPLAY. Do you believe it?",
+                bodyStyle);
+            if (GUI.Button(new Rect(left + 30f, top + 115f, 210f, 48f), "1  Trust the warning"))
+                ResolveOfficeWarning(true);
+            if (GUI.Button(new Rect(left + 270f, top + 115f, 210f, 48f), "2  Ignore it"))
+                ResolveOfficeWarning(false);
+        }
     }
 }

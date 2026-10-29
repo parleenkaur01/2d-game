@@ -1,14 +1,16 @@
 using UnityEngine;
 
-/// <summary>The illuminated button that starts the opening elevator ride.</summary>
+/// <summary>The illuminated button that starts an elevator ride.</summary>
 public class ElevatorButton : Interactable
 {
     private PrototypeDirector director;
+    private int destinationFloor;
 
-    public void Configure(PrototypeDirector owner)
+    public void Configure(PrototypeDirector owner, int floor)
     {
         director = owner;
-        prompt = "Press the illuminated button";
+        destinationFloor = floor;
+        prompt = "Go to Floor " + floor;
     }
 
     public override void Interact(PlayerController player)
@@ -17,6 +19,6 @@ public class ElevatorButton : Interactable
 
         canInteract = false;
         director.PlayElevatorButtonSound();
-        director.BeginFirstFloor(player);
+        director.BeginFloor(player, destinationFloor);
     }
 }
