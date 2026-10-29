@@ -253,6 +253,7 @@ public class PictureDifferencePuzzle : MonoBehaviour
         else if (result == DifferenceResult.AlreadyFound) Say("You already found this difference.");
         else if (result == DifferenceResult.Miss)
         {
+            director.PlayPuzzleFailure();
             Say("Not quite—you are still trapped. Try another spot or Start Again. Your finds are saved.");
         }
     }

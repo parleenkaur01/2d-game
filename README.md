@@ -76,7 +76,7 @@ Progress is kept during the current run only; there is no save/load system.
 
 ## Art and audio
 
-Rooms use simple geometry alongside AI-generated artwork. Sound effects are synthesized at runtime, including elevator movement, button clicks, doors, bells, clock ticking, electrical ambience, and puzzle feedback. There is no continuous background music.
+Rooms use simple geometry alongside AI-generated artwork. Sound effects are synthesized at runtime, including elevator movement, button clicks, doors, bells, clock ticking, electrical ambience, and puzzle feedback. A short descending two-note buzz plays for an incorrect word, a wrong memory-pattern choice, or a wrong click in the picture puzzle. There is no continuous background music.
 
 - [Office artwork and generation prompts](Assets/Resources/Office/ARTWORK.txt): key, table, pen, chair, notebook, and lamp cutouts.
 - [Floor 3 artwork and generation prompts](Assets/Resources/Floor3/ARTWORK.txt): the reference illustration and its targeted removal edit. The game displays only the three edited patches over the original so incidental texture variations do not create extra differences.

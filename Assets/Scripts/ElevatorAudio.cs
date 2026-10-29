@@ -34,7 +34,7 @@ public class ElevatorAudio : MonoBehaviour
         bellClip = CreateBell("Floor Bell");
         doorClip = CreateTone("Sliding Doors", 1.25f, 125f, 0.18f);
         clockClickClip = CreateTone("Clock Click", 0.09f, 940f, 0.19f);
-        failureClip = CreateTone("Clock Reset", 0.35f, 170f, 0.2f);
+        failureClip = CreateErrorSound();
         clueClip = CreateTone("Inspect Note", 0.1f, 520f, 0.13f);
         tickingClip = CreateTone("Clock Tick", 0.035f, 1200f, 0.1f);
         ambienceSource.clip = CreateTone("Office Electrical Buzz", 2f, 120f, 0.09f);
@@ -51,6 +51,28 @@ public class ElevatorAudio : MonoBehaviour
     public void PlayClockTick() => source.PlayOneShot(tickingClip, 0.4f);
     public void StartOfficeAmbience() => ambienceSource.Play();
     public void StopOfficeAmbience() => ambienceSource.Stop();
+
+    private AudioClip CreateErrorSound()
+    {
+        const int sampleRate = 44100;
+        const float length = 0.3f;
+        const float noteLength = 0.13f;
+        int sampleCount = Mathf.CeilToInt(length * sampleRate);
+        AudioClip clip = AudioClip.Create("Wrong Answer", sampleCount, 1, sampleRate, false);
+        float[] samples = new float[sampleCount];
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float time = i / (float)sampleRate;
+            float localTime = time < noteLength ? time : time - 0.16f;
+            if (localTime < 0f || localTime > noteLength) continue;
+            float frequency = time < noteLength ? 330f : 220f;
+            float envelope = Mathf.Sin(Mathf.PI * localTime / noteLength);
+            float phase = 2f * Mathf.PI * frequency * localTime;
+            samples[i] = (Mathf.Sin(phase) + 0.2f * Mathf.Sin(phase * 2f)) * envelope * 0.22f;
+        }
+        clip.SetData(samples, 0);
+        return clip;
+    }
 
     private AudioClip CreateTone(string clipName, float length, float frequency, float volume)
     {
