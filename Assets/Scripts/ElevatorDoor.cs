@@ -12,13 +12,13 @@ public class ElevatorDoor : Interactable
     {
         if (!GameState.Instance.ClockPuzzleSolved)
         {
-            Debug.Log("The elevator door will not open yet.");
+            FindObjectOfType<PrototypeDirector>().ShowMessage(
+                "The elevator door is locked. Set all three clocks first.", 4f);
             return;
         }
 
+        canInteract = false;
         GameState.Instance.OpenDoor();
-        GameState.Instance.AddTrust(1);
-        Object.FindFirstObjectByType<PrototypeDirector>().ShowEnding(
-            "ENDING PREVIEW\nYou trusted the elevator and found a way forward.");
+        FindObjectOfType<PrototypeDirector>().ReturnFromClockRoom(player);
     }
 }

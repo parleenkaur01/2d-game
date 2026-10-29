@@ -5,9 +5,12 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float interactionDistance = 1.6f;
+    // Interactable controls are mounted on the elevator wall above the player.
+    // This range lets the player reach them without requiring vertical movement.
+    [SerializeField] private float interactionDistance = 2.8f;
     private Rigidbody2D body;
     private Interactable nearbyInteractable;
+    private bool movementEnabled = true;
 
     private void Awake()
     {
@@ -18,7 +21,16 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        body.linearVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeed, 0f);
+        body.linearVelocity = movementEnabled
+            ? new Vector2(Input.GetAxisRaw("Horizontal") * moveSpeed, 0f)
+            : Vector2.zero;
+
+        if (!movementEnabled)
+        {
+            nearbyInteractable = null;
+            return;
+        }
+
         FindNearbyInteractable();
 
         if (nearbyInteractable != null && (Input.GetKeyDown(KeyCode.E) ||
@@ -27,6 +39,17 @@ public class PlayerController : MonoBehaviour
         {
             nearbyInteractable.Interact(this);
         }
+    }
+
+    public void SetMovementEnabled(bool enabled)
+    {
+        movementEnabled = enabled;
+        if (!enabled && body != null) body.linearVelocity = Vector2.zero;
+    }
+
+    public void SetInteractionDistance(float distance)
+    {
+        interactionDistance = distance;
     }
 
     private void FindNearbyInteractable()
