@@ -1,33 +1,101 @@
 # The Last Elevator
 
-Unity 2D prototype for the individual 2D game project.
+A small Unity 2D puzzle adventure by **Parleen Kaur**. Escape a mysterious elevator by completing three floors: a word scramble, an upside-down memory challenge, and a spot-the-difference puzzle.
 
-## Current vertical slice
+The focus is exploration, observation, and approachable puzzles. There is no combat or time limit.
 
-The game starts inside the elevator. Examine the warning on the left, press the glowing button on the right, and ride to **Floor 1: The Clock Room**. Open the letter board on the left or interact with a clock. Solve three word scrambles of increasing length using each round's riddle. Click letter tiles or type to assemble an answer; Enter checks it and Backspace undoes a letter. Undo, clear, reshuffle, and a first-letter hint are also available. Each solved word starts a clock. Progress survives closing the board with Esc. When all three clocks are restored, return through the unlocked elevator door.
+## Run the game
 
-Back in the elevator, press the glowing button to ride to **Floor 2: The Upside-Down Office**. The six realistic object images stay upside down. Move in four directions using WASD or arrows. Click Watch Pattern or examine the paper to start a memory challenge. Objects briefly grow and gain a bright yellow frame as they flash. Repeat the pattern by walking near and clicking each object. Three rounds contain two, three, and four flashes, with new patterns each run. Watch Again replays the current round; a wrong click resets only that round's attempt, keeping completed rounds. There is no time limit. Completing all three rounds unlocks the elevator for Floor 3.
+1. Install **Unity 6000.6.2f1** (Unity 6.6) through Unity Hub.
+2. Add this repository's folder as a project and open it.
+3. Open [`Assets/Scenes/Main.unity`](Assets/Scenes/Main.unity).
+4. Press **Play**, then click inside the **Game** window to give it keyboard focus.
 
-**Floor 3: Fractured Memories** is a relaxed image-comparison puzzle. Compare the pictures and find three missing objects by clicking their locations in the ORIGINAL picture. The instructions do not name the answers. Click targets are generous and wrong guesses have no penalty. The Hint button zooms toward an unfound object and highlights it in yellow for three seconds without naming it; hints can be reused freely. Use the mouse wheel or zoom buttons (up to 4×) and hold right mouse to pan both pictures together. Differences can be found in any order; correct finds remain marked and cannot count twice. Finding all three completes the game.
+The rooms and interface are created at runtime. An empty scene before pressing Play is expected. When scripts change, stop Play mode, allow Unity to compile, and start again.
 
-## Completion
+## Game flow
 
-Solving Floor 3 means escaping the elevator. After the third difference is found, the pictures stay on screen with **Escape Successful — You successfully escaped!** There is no additional route or ending choice. Until all three differences are found, the player is still trapped and can keep trying with hints or click **Start Again** to restart from the opening elevator. Wrong guesses do not force a restart or remove correct finds. After escaping, click Start Again or press `R` for a fresh run.
+### Opening elevator
 
-Controls:
+Start in a dark elevator at B3. Examine the note or walk to the glowing button on the right and interact. The elevator travels upward with motor audio, vibration, changing floor numbers, a bell, and sliding doors.
 
-- `A/D` or left/right arrows: move
-- `E`, `W`, up arrow, or space: interact
-- On the Floor 1 letter board: type letters or click tiles; Enter checks; Backspace undoes; Esc returns to the room
-- In Floor 2: `WASD` or arrows to move in four directions; mouse click, `E`, or space to interact nearby
-- `1` or `2`, or mouse: choose an answer to the office warning
-- In Floor 3: left mouse marks differences in ORIGINAL; scroll to zoom; hold right mouse and drag to pan
-- `R`: replay after completing Floor 3
+### Floor 1 — The Clock Room
 
-## Running it
+Open the letter board on the left, or interact with one of the stopped clocks. Solve three word scrambles using each round's riddle:
 
-1. Open this folder as a Unity 2D project.
-2. Open `Assets/Scenes/Main.unity`.
-3. Press Play and click inside the Game window to give it keyboard focus. The prototype builds its rooms at runtime.
+- Click letter tiles or type to build an answer.
+- Check the word with **Enter** or the **Check Word** button.
+- Use **Undo**, **Clear**, **Reshuffle**, or a first-letter **Hint** when needed.
+- Click an answer slot to remove that letter.
 
-The prototype uses generated room geometry, original generated object images, and synthesized sound effects. Further art polish, pause controls, and submission materials remain.
+Each solved word starts one clock. Closing the board preserves progress. Restore all three clocks, return to the room, and use the green elevator door. Press the glowing elevator button to continue.
+
+### Floor 2 — The Upside-Down Office
+
+Explore an office containing six realistic, upside-down objects. Click **Watch Pattern**, or examine the paper, to begin the memory challenge.
+
+Objects grow briefly and flash inside a yellow frame. Wait until **YOUR TURN**, then walk near and click the objects in the same order. Three rounds increase from **two flashes** to **three**, then **four**.
+
+- **Watch Again** replays the current pattern as often as needed.
+- A wrong click resets the current attempt, preserving completed rounds.
+- Patterns are randomized for a new run.
+- There is no time limit for repeating a pattern.
+
+Complete all three rounds to unlock the elevator and continue to Floor 3. Optional story warnings provide atmosphere; their choices do not determine whether the player escapes.
+
+### Floor 3 — Fractured Memories
+
+Compare the **ORIGINAL** picture with its altered copy. Three objects are missing from the altered picture. Find them by clicking their locations in **ORIGINAL**; the instructions do not name the answers.
+
+- Find the differences in any order.
+- Correct finds stay marked and cannot count twice.
+- Wrong guesses have no penalty, and click targets are forgiving.
+- **Hint** zooms toward an unfound object and highlights its area for three seconds without naming it.
+- Zoom up to **4×** and pan both pictures together to inspect details.
+
+## Escape and restart
+
+Find all three differences on Floor 3 to see **ESCAPE SUCCESSFUL — You successfully escaped!** The pictures remain visible with the confirmed differences marked. There is no additional exit choice.
+
+While Floor 3 is unfinished, the player is **still trapped**. Keep trying, use hints, or click **Start Again** to return to the opening elevator. Starting again clears progress on every floor. After escaping, **Start Again** or **R** begins a fresh run.
+
+Progress is kept during the current run only; there is no save/load system.
+
+## Controls
+
+| Where | Controls |
+| --- | --- |
+| Elevator and Clock Room | **A/D** or **Left/Right** to move; **E**, **W**, **Up**, or **Space** to interact nearby |
+| Word-scramble board | Click tiles or type letters; **Enter** to check; **Backspace** to undo; **Esc** to return to the room |
+| Upside-Down Office | **WASD** or arrow keys to move in four directions; click nearby objects, or use **E/Space** |
+| Office warning | Click an option or press **1/2**; the popup closes after three seconds |
+| Picture puzzle | Left-click answers in **ORIGINAL**; scroll or use zoom buttons; hold right mouse and drag to pan |
+| Restart | **Start Again** on Floor 3; **R** after a successful escape |
+
+**Esc is not a global pause key.** It closes the Floor 1 letter board. A full pause menu has not been implemented.
+
+## Art and audio
+
+Rooms use simple geometry alongside AI-generated artwork. Sound effects are synthesized at runtime, including elevator movement, button clicks, doors, bells, clock ticking, electrical ambience, and puzzle feedback. There is no continuous background music.
+
+- [Office artwork and generation prompts](Assets/Resources/Office/ARTWORK.txt): key, table, pen, chair, notebook, and lamp cutouts.
+- [Floor 3 artwork and generation prompts](Assets/Resources/Floor3/ARTWORK.txt): the reference illustration and its targeted removal edit. The game displays only the three edited patches over the original so incidental texture variations do not create extra differences.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `Assets/Scenes/Main.unity` | Entry scene |
+| `Assets/Scripts/PrototypeBootstrap.cs` | Creates the runtime camera and director |
+| `Assets/Scripts/PrototypeDirector.cs` | Builds rooms, manages elevator travel, and restarts runs |
+| `Assets/Scripts/WordScrambleState.cs` / `ClockPuzzle.cs` | Floor 1 letter rules and interface |
+| `Assets/Scripts/MemoryPatternState.cs` / `OfficePuzzle.cs` | Floor 2 patterns, flashes, and progress |
+| `Assets/Scripts/PictureDifferencePuzzle.cs` | Floor 3 images, zoom, hints, and answer selection |
+| `Assets/Scripts/GameState.cs` | Progress and choices for the current run |
+| `Assets/Resources/` | Runtime-loaded artwork and asset notes |
+
+## Current status
+
+The prototype implements the opening elevator, all three puzzle floors, escape success, and restart. Development checks have covered Unity compilation, word-tile rules, memory-round recovery, image loading and click mapping, completion gating, and resetting progress.
+
+Remaining work includes a full manual playthrough, visual and audio polish, a pause menu, standalone build verification, gameplay recording, and submission documentation. No standalone build is included. Add `Main.unity` to the build's scene list before creating one.
