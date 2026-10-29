@@ -14,6 +14,10 @@ public class GameState : MonoBehaviour
     public bool TrustedOfficeWarning { get; private set; }
     public bool InspectedElevatorWarning { get; private set; }
     public bool InspectedClockClue { get; private set; }
+    public bool InspectedHallwayClue { get; private set; }
+    public int HallwayChangesFound { get; private set; }
+    public bool HallwaySolved => HallwayChangesFound == 3;
+    public bool RunFinished { get; private set; }
     public int CurrentFloor { get; private set; }
     public int TrustScore { get; private set; }
 
@@ -43,6 +47,10 @@ public class GameState : MonoBehaviour
     public void InspectClockClue() => InspectedClockClue = true;
     public void EnterFloor(int floorNumber) => CurrentFloor = floorNumber;
     public void AddTrust(int amount) => TrustScore += amount;
+    public void InspectHallwayClue() => InspectedHallwayClue = true;
+    public void RecordHallwayChange() => HallwayChangesFound = Mathf.Min(3, HallwayChangesFound + 1);
+
+    public void CompleteRun() => RunFinished = HallwaySolved;
 
     public void ResetRun()
     {
@@ -55,6 +63,9 @@ public class GameState : MonoBehaviour
         TrustedOfficeWarning = false;
         InspectedElevatorWarning = false;
         InspectedClockClue = false;
+        InspectedHallwayClue = false;
+        HallwayChangesFound = 0;
+        RunFinished = false;
         CurrentFloor = 0;
         TrustScore = 0;
     }

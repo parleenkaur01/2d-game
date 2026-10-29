@@ -25,8 +25,8 @@ public class ElevatorDoor : Interactable
         if (!IsUnlocked)
         {
             director.ShowMessage(floorNumber == 1
-                ? "The elevator door is locked. Set all three clocks first."
-                : "The door is locked. Follow the pictures and activate the marked objects.", 4f);
+                ? "The door is locked. Solve the three word scrambles to restore the clocks."
+                : "The door is locked. Complete the three memory rounds first.", 4f);
             return;
         }
 

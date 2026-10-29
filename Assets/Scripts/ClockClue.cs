@@ -1,20 +1,22 @@
 using UnityEngine;
 
-/// <summary>The inspectable note that reveals the first-floor solution.</summary>
+/// <summary>The letter board that opens Floor 1's word puzzle.</summary>
 public class ClockClue : Interactable
 {
     private PrototypeDirector director;
+    private ClockPuzzle puzzle;
 
-    public void Configure(PrototypeDirector owner)
+    public void Configure(PrototypeDirector owner, ClockPuzzle wordPuzzle)
     {
         director = owner;
-        prompt = "Read the clock note";
+        puzzle = wordPuzzle;
+        prompt = "Open the letter board";
     }
 
     public override void Interact(PlayerController player)
     {
         GameState.Instance.InspectClockClue();
-        director.ShowMessage("The note reads: SET THE CLOCKS IN THIS ORDER — III, I, II.", 8f);
         director.PlayClueSound();
+        puzzle.Open(player);
     }
 }

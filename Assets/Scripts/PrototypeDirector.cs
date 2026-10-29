@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Builds the opening elevator and two playable floors from simple shapes.
+/// Builds the elevator, three floors, and the final completion screen.
 /// Authored scenes and artwork can replace these generated rooms later.
 /// </summary>
 public class PrototypeDirector : MonoBehaviour
@@ -11,7 +11,8 @@ public class PrototypeDirector : MonoBehaviour
     {
         Elevator,
         ClockRoom,
-        Office
+        Office,
+        Hallway
     }
 
     private GUIStyle titleStyle;
@@ -33,6 +34,8 @@ public class PrototypeDirector : MonoBehaviour
     private float statusMessageTimer;
     private PlayerController officeChoicePlayer;
     private float officeWarningTimer;
+    private PictureDifferencePuzzle picturePuzzle;
+    private ClockPuzzle clockPuzzle;
 
     public bool IsTransitioning { get; private set; }
 
@@ -67,12 +70,8 @@ public class PrototypeDirector : MonoBehaviour
             }
         }
 
-        if (phase == RoomPhase.Elevator && GameState.Instance != null &&
-            GameState.Instance.OfficeDoorOpened && !IsTransitioning && Input.GetKeyDown(KeyCode.R))
-        {
-            GameState.Instance.ResetRun();
-            BuildElevatorRoom(0);
-        }
+        if (phase == RoomPhase.Hallway && GameState.Instance.RunFinished && Input.GetKeyDown(KeyCode.R))
+            RestartGame();
 
         if (phase == RoomPhase.Elevator && !IsTransitioning && elevatorButtonTransform != null)
         {
@@ -130,7 +129,7 @@ public class PrototypeDirector : MonoBehaviour
         CreateBlock("Control Panel", new Vector2(3.25f, -0.2f), new Vector2(0.9f, 2.1f),
             new Color(0.28f, 0.29f, 0.32f), -1, false);
 
-        if (completedFloor < 2)
+        if (completedFloor < 3)
         {
             GameObject button = CreateBlock("Illuminated Floor Button", new Vector2(3.25f, 0.15f),
                 new Vector2(0.38f, 0.38f), new Color(0.9f, 0.65f, 0.12f), 1);
@@ -154,12 +153,12 @@ public class PrototypeDirector : MonoBehaviour
             ? "The elevator is silent. One button is still glowing."
             : completedFloor == 1
                 ? "Floor 1 complete. Press the glowing button for Floor 2."
-                : "Floor 2 complete. Press R to replay while Floor 3 is being built.", 6f);
+                : "Floor 2 complete. Press the glowing button for Floor 3.", 6f);
     }
 
     public void BeginFloor(PlayerController player, int destinationFloor)
     {
-        if (IsTransitioning || destinationFloor < 1 || destinationFloor > 2) return;
+        if (IsTransitioning || destinationFloor < 1 || destinationFloor > 3) return;
 
         IsTransitioning = true;
         player.SetMovementEnabled(false);
@@ -186,7 +185,7 @@ public class PrototypeDirector : MonoBehaviour
                 else if (progress < 0.85f) floorDisplayText = "↑  G";
                 else floorDisplayText = "↑  1";
             }
-            else floorDisplayText = progress < 0.65f ? "↑  1" : "↑  2";
+            else floorDisplayText = "↑  " + (progress < 0.65f ? destinationFloor - 1 : destinationFloor);
 
             float horizontalShake = Mathf.Sin(elapsed * 27f) * 0.025f;
             float verticalRumble = Mathf.Sin(elapsed * 39f) * 0.07f;
@@ -233,7 +232,8 @@ public class PrototypeDirector : MonoBehaviour
         yield return new WaitForSeconds(0.65f);
 
         if (destinationFloor == 1) BuildClockRoom();
-        else BuildOfficeRoom();
+        else if (destinationFloor == 2) BuildOfficeRoom();
+        else BuildHallway();
         IsTransitioning = false;
     }
 
@@ -260,13 +260,14 @@ public class PrototypeDirector : MonoBehaviour
             new Color(0.25f, 0.2f, 0.17f), -1, false);
         GameObject clue = CreateBlock("Clock Clue Note", new Vector2(-6.15f, -0.65f),
             new Vector2(1.2f, 0.95f), new Color(0.79f, 0.75f, 0.58f), 1, false);
-        clue.AddComponent<ClockClue>().Configure(this);
 
         GameObject puzzleObject = new GameObject("Clock Puzzle");
         puzzleObject.transform.SetParent(roomRoot.transform);
         ClockPuzzle puzzle = puzzleObject.AddComponent<ClockPuzzle>();
+        clockPuzzle = puzzle;
         puzzle.Configure(this);
         puzzle.RegisterClue(clue.transform);
+        clue.AddComponent<ClockClue>().Configure(this, puzzle);
 
         for (int i = 0; i < 3; i++)
         {
@@ -275,10 +276,15 @@ public class PrototypeDirector : MonoBehaviour
                 new Vector2(1.5f, 1.5f), new Color(0.55f, 0.41f, 0.2f), -1, false);
             GameObject clock = CreateBlock("Clock " + (i + 1), clockPosition,
                 new Vector2(1.25f, 1.25f), new Color(0.55f, 0.65f, 0.85f), 0, false);
-            CreateBlock("Clock Hand " + (i + 1), clockPosition + new Vector2(0f, 0.23f),
+            GameObject hand = CreateBlock("Clock Hand " + (i + 1), clockPosition + new Vector2(0f, 0.23f),
                 new Vector2(0.07f, 0.4f), new Color(0.12f, 0.17f, 0.24f), 1, false);
+            Transform handPivot = new GameObject("Clock Hand Pivot").transform;
+            handPivot.SetParent(roomRoot.transform, false);
+            handPivot.localPosition = clockPosition;
+            hand.transform.SetParent(handPivot, true);
             ClockSwitch clockSwitch = clock.AddComponent<ClockSwitch>();
             clockSwitch.Configure(puzzle, i);
+            clockSwitch.RegisterHand(handPivot);
             puzzle.RegisterClock(i, clockSwitch);
         }
 
@@ -290,7 +296,7 @@ public class PrototypeDirector : MonoBehaviour
         elevatorDoor.Configure(this, 1);
         puzzle.RegisterDoor(door.GetComponent<SpriteRenderer>());
 
-        ShowMessage("Three stopped clocks. Read the note on the left to learn their order.", 7f);
+        ShowMessage("The clocks have lost their words. Open the letter board on the left to restore them.", 3f);
     }
 
     private void BuildOfficeRoom()
@@ -329,28 +335,10 @@ public class PrototypeDirector : MonoBehaviour
         warning.AddComponent<OfficeWarning>().Configure(this);
         MakeOfficeClickable(warning);
 
-        GameObject hintBoard = new GameObject("Picture Hint");
-        hintBoard.transform.SetParent(roomRoot.transform, false);
-        GameObject hintPaper = CreateBlock("Picture Strip", new Vector2(-5.4f, 0.95f),
-            new Vector2(3.5f, 0.95f), new Color(0.8f, 0.79f, 0.62f), 1, false);
-        hintPaper.transform.SetParent(hintBoard.transform, true);
-        for (int step = 0; step < OfficePuzzle.PictureOrder.Length; step++)
-        {
-            CreateOfficePicture(hintBoard.transform, OfficePuzzle.PictureOrder[step],
-                new Vector3(-6.4f + step, 0.95f, 0f), 0.7f);
-            if (step < 2)
-            {
-                float x = -5.9f + step;
-                CreateGlyphStroke(hintBoard.transform, new Vector2(x, 1f), new Vector2(0.05f, 0.18f), 45f);
-                CreateGlyphStroke(hintBoard.transform, new Vector2(x, 0.9f), new Vector2(0.05f, 0.18f), -45f);
-            }
-        }
-        hintBoard.SetActive(false);
-
         GameObject puzzleObject = new GameObject("Office Button Puzzle");
         puzzleObject.transform.SetParent(roomRoot.transform);
         OfficePuzzle puzzle = puzzleObject.AddComponent<OfficePuzzle>();
-        puzzle.Configure(this, warning.transform, hintBoard);
+        puzzle.Configure(this, warning.transform);
         clue.AddComponent<OfficeClue>().Configure(this, puzzle);
 
         Vector2[] objectPositions = {
@@ -381,12 +369,34 @@ public class PrototypeDirector : MonoBehaviour
         MakeOfficeClickable(door);
         puzzle.RegisterDoor(door.GetComponent<SpriteRenderer>());
 
-        ShowMessage("The office is upside down. Move with WASD or arrows. Click the paper on the left for a hint.", 8f);
+        ShowMessage("Watch the objects flash, then repeat their order. Click Watch Pattern to begin.", 3f);
     }
 
     private void MakeOfficeClickable(GameObject target)
     {
         target.AddComponent<BoxCollider2D>().isTrigger = true;
+    }
+
+    private void BuildHallway()
+    {
+        BeginRoom("Fractured Memories");
+        phase = RoomPhase.Hallway;
+        GameState.Instance.EnterFloor(3);
+        ConfigureCamera();
+        Camera.main.backgroundColor = Color.black;
+        picturePuzzle = roomRoot.AddComponent<PictureDifferencePuzzle>();
+        picturePuzzle.Configure(this);
+        statusMessageTimer = 0f;
+    }
+
+    public void RestartGame()
+    {
+        officeChoicePlayer = null;
+        IsTransitioning = false;
+        elevatorAudio.StopOfficeAmbience();
+        GameState.Instance.ResetRun();
+        ConfigureCamera();
+        BuildElevatorRoom(0);
     }
 
     private GameObject CreateOfficePicture(Transform parent, int index, Vector3 position,
@@ -405,15 +415,6 @@ public class PrototypeDirector : MonoBehaviour
         picture.transform.localScale = Vector3.one *
             (maximumSize * 100f / Mathf.Max(texture.width, texture.height));
         return picture;
-    }
-
-    private void CreateGlyphStroke(Transform parent, Vector2 position, Vector2 size, float angle = 0f)
-    {
-        Transform stroke = CreateBlock("Mark Stroke", Vector2.zero, size,
-            new Color(0.1f, 0.16f, 0.13f), 3, false).transform;
-        stroke.SetParent(parent, false);
-        stroke.localPosition = position;
-        stroke.localRotation = Quaternion.Euler(0f, 0f, angle);
     }
 
     public void PresentOfficeWarning(PlayerController player)
@@ -477,7 +478,12 @@ public class PrototypeDirector : MonoBehaviour
 
     private void BeginRoom(string roomName)
     {
-        if (roomRoot != null) Destroy(roomRoot);
+        if (roomRoot != null)
+        {
+            // Stop the previous room's camera and input logic immediately.
+            roomRoot.SetActive(false);
+            Destroy(roomRoot);
+        }
         roomRoot = new GameObject(roomName);
     }
 
@@ -560,6 +566,18 @@ public class PrototypeDirector : MonoBehaviour
                 normal = { textColor = new Color(1f, 0.35f, 0.15f) }
             };
 
+        if (phase == RoomPhase.Hallway)
+        {
+            picturePuzzle.DrawGUI();
+            return;
+        }
+
+        if (phase == RoomPhase.ClockRoom && clockPuzzle != null && clockPuzzle.IsOpen)
+        {
+            clockPuzzle.DrawGUI();
+            return;
+        }
+
         GUI.Label(new Rect(0f, 15f, Screen.width, 40f), "THE LAST ELEVATOR", titleStyle);
 
         string subtitle = phase == RoomPhase.Elevator
@@ -568,7 +586,8 @@ public class PrototypeDirector : MonoBehaviour
                 : GameState.Instance != null && GameState.Instance.DoorOpened
                     ? "Elevator — Floor 1 Complete" : "Inside the Elevator")
             : phase == RoomPhase.ClockRoom ? "Floor 1: The Clock Room"
-                : "Floor 2: The Upside-Down Office";
+                : phase == RoomPhase.Office ? "Floor 2: The Upside-Down Office"
+                    : "Floor 3: Fractured Memories";
         GUI.Label(new Rect(0f, 55f, Screen.width, 35f), subtitle, bodyStyle);
 
         if (phase == RoomPhase.Elevator)
@@ -585,9 +604,11 @@ public class PrototypeDirector : MonoBehaviour
         GUI.Label(new Rect(0f, Screen.height - 45f, Screen.width, 30f),
             phase == RoomPhase.Elevator && GameState.Instance != null &&
             GameState.Instance.OfficeDoorOpened
-                ? "Floor 2 complete   R: replay from the beginning"
+                ? "Press the glowing button to continue to Floor 3"
                 : phase == RoomPhase.Office
                     ? "WASD / arrows: move   Mouse click / E / Space: interact"
+                    : phase == RoomPhase.Hallway
+                        ? "A/D / left-right: move   Mouse click / E / Space: examine"
                     : "A/D or arrows: move   E/W/Space: interact", bodyStyle);
 
         if (officeChoicePlayer != null)
@@ -603,5 +624,6 @@ public class PrototypeDirector : MonoBehaviour
             if (GUI.Button(new Rect(left + 270f, top + 115f, 210f, 48f), "2  Ignore it"))
                 ResolveOfficeWarning(false);
         }
+
     }
 }

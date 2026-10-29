@@ -9,14 +9,14 @@ public class OfficeClue : Interactable
     {
         director = owner;
         puzzle = officePuzzle;
-        prompt = "Examine the torn sketch";
+        prompt = "Start / replay the memory pattern";
     }
 
     public override void Interact(PlayerController player)
     {
         GameState.Instance.InspectOfficeClue();
         puzzle.RevealHint();
-        director.ShowMessage("Click key → table → pen. Move close to each upside-down object, then click it.", OfficePuzzle.HintDuration);
+        director.ShowMessage("Watch the highlighted objects, then click them in the same order.", 3f);
         director.PlayClueSound();
     }
 }

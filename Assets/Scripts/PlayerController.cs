@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour
     private Interactable nearbyInteractable;
     private bool movementEnabled = true;
     private bool officeMovement;
+    private bool mouseInteraction;
+    private bool limitMovement;
+    private Vector2 minimumPosition;
+    private Vector2 maximumPosition;
 
     private void Awake()
     {
@@ -34,7 +38,7 @@ public class PlayerController : MonoBehaviour
 
         FindNearbyInteractable();
 
-        if (officeMovement && Input.GetMouseButtonDown(0))
+        if (mouseInteraction && Input.GetMouseButtonDown(0))
         {
             Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             foreach (Collider2D hit in Physics2D.OverlapPointAll(point))
@@ -57,14 +61,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void EnableOfficeMovement() => officeMovement = true;
+    public void EnableOfficeMovement()
+    {
+        officeMovement = true;
+        mouseInteraction = true;
+        limitMovement = true;
+        minimumPosition = new Vector2(-7.2f, -2.2f);
+        maximumPosition = new Vector2(7.2f, 1.4f);
+    }
 
     private void FixedUpdate()
     {
-        if (!officeMovement) return;
+        if (!limitMovement) return;
         Vector2 position = body.position;
-        position.x = Mathf.Clamp(position.x, -7.2f, 7.2f);
-        position.y = Mathf.Clamp(position.y, -2.2f, 1.4f);
+        position.x = Mathf.Clamp(position.x, minimumPosition.x, maximumPosition.x);
+        position.y = Mathf.Clamp(position.y, minimumPosition.y, maximumPosition.y);
         body.position = position;
     }
 
@@ -100,6 +111,6 @@ public class PlayerController : MonoBehaviour
     {
         if (nearbyInteractable == null) return;
         GUI.Box(new Rect(Screen.width / 2f - 160f, Screen.height - 90f, 320f, 45f),
-            (officeMovement ? "Click / E / Space: " : "E / W / Space: ") + nearbyInteractable.GetPrompt());
+            (mouseInteraction ? "Click / E / Space: " : "E / W / Space: ") + nearbyInteractable.GetPrompt());
     }
 }
