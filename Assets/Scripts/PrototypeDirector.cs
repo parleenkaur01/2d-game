@@ -479,6 +479,7 @@ public class PrototypeDirector : MonoBehaviour
     public void PlayPuzzleSuccess() => elevatorAudio.PlayPuzzleSuccess();
     public void PlayClueSound() => elevatorAudio.PlayClue();
     public void PlayClockTick() => elevatorAudio.PlayClockTick();
+    public void PlayFootstep() => elevatorAudio.PlayFootstep();
 
     private void OnGUI()
     {

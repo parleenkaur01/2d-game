@@ -16,12 +16,15 @@ public class PlayerController : MonoBehaviour
     private bool limitMovement;
     private Vector2 minimumPosition;
     private Vector2 maximumPosition;
+    private PrototypeDirector director;
+    private float footstepTimer;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         body.gravityScale = 0f;
         body.freezeRotation = true;
+        director = FindFirstObjectByType<PrototypeDirector>();
     }
 
     private void Update()
@@ -29,6 +32,18 @@ public class PlayerController : MonoBehaviour
         Vector2 direction = new Vector2(Input.GetAxisRaw("Horizontal"),
             officeMovement ? Input.GetAxisRaw("Vertical") : 0f);
         body.linearVelocity = movementEnabled ? direction.normalized * moveSpeed : Vector2.zero;
+
+        bool walking = movementEnabled && direction.sqrMagnitude > 0.01f;
+        if (walking)
+        {
+            footstepTimer -= Time.deltaTime;
+            if (footstepTimer <= 0f)
+            {
+                director?.PlayFootstep();
+                footstepTimer = 0.34f;
+            }
+        }
+        else footstepTimer = 0f;
 
         if (!movementEnabled)
         {

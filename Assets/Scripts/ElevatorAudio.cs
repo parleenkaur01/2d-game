@@ -16,6 +16,9 @@ public class ElevatorAudio : MonoBehaviour
     private AudioClip failureClip;
     private AudioClip clueClip;
     private AudioClip tickingClip;
+    private AudioClip leftFootstepClip;
+    private AudioClip rightFootstepClip;
+    private bool nextFootstepIsRight;
 
     private void Awake()
     {
@@ -37,6 +40,8 @@ public class ElevatorAudio : MonoBehaviour
         failureClip = CreateErrorSound();
         clueClip = CreateTone("Inspect Note", 0.1f, 520f, 0.13f);
         tickingClip = CreateTone("Clock Tick", 0.035f, 1200f, 0.1f);
+        leftFootstepClip = CreateFootstep("Left Footstep", 88f);
+        rightFootstepClip = CreateFootstep("Right Footstep", 104f);
         ambienceSource.clip = CreateTone("Office Electrical Buzz", 2f, 120f, 0.09f);
     }
 
@@ -49,6 +54,11 @@ public class ElevatorAudio : MonoBehaviour
     public void PlayPuzzleSuccess() => source.PlayOneShot(bellClip);
     public void PlayClue() => source.PlayOneShot(clueClip);
     public void PlayClockTick() => source.PlayOneShot(tickingClip, 0.4f);
+    public void PlayFootstep()
+    {
+        source.PlayOneShot(nextFootstepIsRight ? rightFootstepClip : leftFootstepClip, 0.55f);
+        nextFootstepIsRight = !nextFootstepIsRight;
+    }
     public void StartOfficeAmbience() => ambienceSource.Play();
     public void StopOfficeAmbience() => ambienceSource.Stop();
 
@@ -70,6 +80,27 @@ public class ElevatorAudio : MonoBehaviour
             float phase = 2f * Mathf.PI * frequency * localTime;
             samples[i] = (Mathf.Sin(phase) + 0.2f * Mathf.Sin(phase * 2f)) * envelope * 0.22f;
         }
+        clip.SetData(samples, 0);
+        return clip;
+    }
+
+    private AudioClip CreateFootstep(string clipName, float baseFrequency)
+    {
+        const int sampleRate = 44100;
+        const float length = 0.12f;
+        int sampleCount = Mathf.CeilToInt(length * sampleRate);
+        AudioClip clip = AudioClip.Create(clipName, sampleCount, 1, sampleRate, false);
+        float[] samples = new float[sampleCount];
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float time = i / (float)sampleRate;
+            float impact = Mathf.Exp(-32f * time);
+            float body = Mathf.Sin(2f * Mathf.PI * baseFrequency * time);
+            float sole = Mathf.Sin(2f * Mathf.PI * (baseFrequency * 2.4f) * time) * 0.35f;
+            samples[i] = (body + sole) * impact * 0.24f;
+        }
+
         clip.SetData(samples, 0);
         return clip;
     }
