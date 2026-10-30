@@ -108,16 +108,28 @@ public class OfficePuzzle : MonoBehaviour
         if (labelStyle == null)
             labelStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 16,
+                fontSize = 20,
+                fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.88f, 0.94f, 0.88f) }
+                normal = { textColor = Color.white }
             };
 
-        string status = memory.Solved ? "Memory challenge complete!"
-            : showing ? "WATCH • Round " + (memory.Round + 1) + "/3 • Flash " + flashStep + "/" + memory.CurrentPattern.Length
-            : ready ? "YOUR TURN • Round " + (memory.Round + 1) + "/3 • Repeat " + memory.CurrentPattern.Length + " objects • R to replay"
-            : "Watch the objects flash, then click them in the same order • R to replay";
-        GUI.Label(new Rect(20f, 88f, Screen.width - 40f, 30f), status, labelStyle);
+        string status = memory.Solved ? "COMPLETE — The elevator is open"
+            : showing ? "WATCH CLOSELY — Round " + (memory.Round + 1) + "/3 — Flash " + flashStep + "/" + memory.CurrentPattern.Length
+            : ready ? "YOUR TURN — Repeat " + memory.CurrentPattern.Length + " objects in order   •   R: Replay"
+            : "WATCH THE OBJECTS — Then repeat them in the same order";
+        labelStyle.normal.textColor = memory.Solved
+            ? new Color(0.45f, 1f, 0.62f)
+            : ready ? new Color(1f, 0.88f, 0.28f)
+            : new Color(0.62f, 0.9f, 1f);
+
+        Rect statusArea = new Rect(12f, 88f, Screen.width - 24f, 38f);
+        Color oldColor = GUI.color;
+        GUI.color = new Color(0.015f, 0.035f, 0.03f, 0.88f);
+        GUI.DrawTexture(statusArea, Texture2D.whiteTexture);
+        GUI.color = Color.white;
+        GUI.Label(statusArea, status, labelStyle);
+        GUI.color = oldColor;
 
         if (flashing >= 0)
         {
