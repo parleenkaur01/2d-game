@@ -4,7 +4,7 @@ A small Unity 2D puzzle adventure by **Parleen Kaur**. Escape a mysterious eleva
 
 The focus is exploration, observation, and approachable puzzles. There is no combat or time limit.
 
-The player is a miniature explorer character with a walking bob, subtle idle breathing, and left/right facing. The character appears in the elevator and both explorable rooms.
+The player is a miniature explorer character with a walking bob, subtle idle breathing, left/right facing, and alternating footstep sounds. The character appears in the elevator and both explorable rooms.
 
 ## Run the game
 
@@ -19,7 +19,7 @@ The rooms and interface are created at runtime. An empty scene before pressing P
 
 ### Opening elevator
 
-Start in a dark elevator at B3. Walk to the glowing button on the right and interact to travel upward. The elevator moves with motor audio, vibration, changing floor numbers, a bell, and sliding doors.
+Start in a dark elevator at B3. Follow the opening instruction: **Move right to the glowing button, then press E or Space.** The elevator moves with motor audio, vibration, changing floor numbers, a bell, and sliding doors.
 
 ### Floor 1 — The Clock Room
 
@@ -36,7 +36,7 @@ Each solved word starts one clock. Closing the board preserves progress. Restore
 
 Explore an office containing six realistic, upside-down objects. The memory pattern begins automatically when you enter.
 
-Objects grow briefly and flash inside a yellow frame. Wait until **YOUR TURN**, then walk near and click the objects in the same order. Three rounds increase from **two flashes** to **three**, then **four**.
+Objects grow briefly and flash inside a yellow frame. The clear status strip is blue while the pattern plays, yellow on **YOUR TURN**, and green after completion. Wait until **YOUR TURN**, then walk near and click the objects in the same order. Three rounds increase from **two flashes** to **three**, then **four**.
 
 - Press **R** to replay the current pattern as often as needed.
 - A wrong click resets the current attempt, preserving completed rounds.
@@ -44,6 +44,8 @@ Objects grow briefly and flash inside a yellow frame. Wait until **YOUR TURN**, 
 - There is no time limit for repeating a pattern.
 
 Complete all three rounds to unlock the elevator and continue to Floor 3.
+
+The Floor 2 screen keeps the puzzle area clear: there is no warning popup, clue board, or large locked label. The exit door changes to green when the memory challenge is complete.
 
 ### Floor 3 — Fractured Memories
 
@@ -93,11 +95,11 @@ Rooms use simple geometry alongside AI-generated artwork. Sound effects are synt
 | `Assets/Scripts/WordScrambleState.cs` / `ClockPuzzle.cs` | Floor 1 letter rules and interface |
 | `Assets/Scripts/MemoryPatternState.cs` / `OfficePuzzle.cs` | Floor 2 patterns, flashes, and progress |
 | `Assets/Scripts/PictureDifferencePuzzle.cs` | Floor 3 images, zoom, hints, and answer selection |
-| `Assets/Scripts/GameState.cs` | Progress and choices for the current run |
+| `Assets/Scripts/GameState.cs` | Puzzle progress for the current run |
 | `Assets/Resources/` | Runtime-loaded artwork and asset notes |
 
 ## Current status
 
-The prototype implements the opening elevator, all three puzzle floors, escape success, and restart. Development checks have covered Unity compilation, word-tile rules, memory-round recovery, image loading and click mapping, completion gating, and resetting progress.
+The prototype implements the opening elevator, miniature player with footsteps, all three puzzle floors, escape success, and restart. Development checks have covered Unity compilation, player presentation, word-tile rules, memory-round recovery, image loading and click mapping, completion gating, and resetting progress.
 
 Remaining work includes a full manual playthrough, visual and audio polish, a pause menu, standalone build verification, gameplay recording, and submission documentation. No standalone build is included. Add `Main.unity` to the build's scene list before creating one.
