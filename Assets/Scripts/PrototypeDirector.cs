@@ -32,8 +32,6 @@ public class PrototypeDirector : MonoBehaviour
     private string statusMessage;
     private string floorDisplayText = "B3";
     private float statusMessageTimer;
-    private PlayerController officeChoicePlayer;
-    private float officeWarningTimer;
     private PictureDifferencePuzzle picturePuzzle;
     private ClockPuzzle clockPuzzle;
 
@@ -56,19 +54,6 @@ public class PrototypeDirector : MonoBehaviour
     {
         if (statusMessageTimer > 0f)
             statusMessageTimer -= Time.deltaTime;
-
-        if (officeChoicePlayer != null)
-        {
-            officeWarningTimer -= Time.unscaledDeltaTime;
-            if (Input.GetKeyDown(KeyCode.Alpha1)) ResolveOfficeWarning(true);
-            else if (Input.GetKeyDown(KeyCode.Alpha2)) ResolveOfficeWarning(false);
-            else if (officeWarningTimer <= 0f)
-            {
-                // Dismiss without making a choice on the player's behalf.
-                officeChoicePlayer.SetMovementEnabled(true);
-                officeChoicePlayer = null;
-            }
-        }
 
         if (phase == RoomPhase.Hallway && GameState.Instance.RunFinished && Input.GetKeyDown(KeyCode.R))
             RestartGame();
@@ -312,30 +297,12 @@ public class PrototypeDirector : MonoBehaviour
         CreateBlock("Fluorescent Light", new Vector2(0f, 2.15f), new Vector2(2.8f, 0.12f),
             new Color(0.69f, 0.82f, 0.62f), -2, false);
 
-        // A single recognizable upside-down table is the puzzle's furniture target.
-        CreateBlock("Floating Paper Left", new Vector2(-4.3f, 0.35f), new Vector2(0.5f, 0.7f),
-            new Color(0.68f, 0.69f, 0.53f), -1, false);
-        CreateBlock("Floating Paper Right", new Vector2(3.8f, 0.7f), new Vector2(0.55f, 0.65f),
-            new Color(0.68f, 0.69f, 0.53f), -1, false);
-
         CreatePlayer(new Vector2(-6.1f, -2.2f), 1.8f).EnableOfficeMovement();
-
-        CreateBlock("File Board", new Vector2(-6.15f, -0.65f), new Vector2(1.5f, 1.25f),
-            new Color(0.26f, 0.28f, 0.22f), -1, false);
-        GameObject clue = CreateBlock("Office Desk File", new Vector2(-6.15f, -0.65f),
-            new Vector2(1.1f, 0.85f), new Color(0.76f, 0.75f, 0.57f), 1, false);
-        MakeOfficeClickable(clue);
-
-        GameObject warning = CreateBlock("Office Warning", new Vector2(-4.35f, -0.65f),
-            new Vector2(0.85f, 0.85f), new Color(0.72f, 0.36f, 0.24f), 1, false);
-        warning.AddComponent<OfficeWarning>().Configure(this);
-        MakeOfficeClickable(warning);
 
         GameObject puzzleObject = new GameObject("Office Button Puzzle");
         puzzleObject.transform.SetParent(roomRoot.transform);
         OfficePuzzle puzzle = puzzleObject.AddComponent<OfficePuzzle>();
-        puzzle.Configure(this, warning.transform);
-        clue.AddComponent<OfficeClue>().Configure(this, puzzle);
+        puzzle.Configure(this);
 
         Vector2[] objectPositions = {
             new Vector2(-1.9f, -1.5f), new Vector2(0.8f, 1f), new Vector2(3.6f, -1.5f),
@@ -357,6 +324,8 @@ public class PrototypeDirector : MonoBehaviour
             puzzle.RegisterButton(i, officeButton);
         }
 
+        puzzle.BeginChallenge();
+
         CreateBlock("Office Door Frame", new Vector2(6.1f, -0.8f), new Vector2(2.4f, 4.4f),
             new Color(0.41f, 0.48f, 0.35f), -2, false);
         GameObject door = CreateBlock("Office Elevator Door", new Vector2(6f, -0.8f),
@@ -365,7 +334,6 @@ public class PrototypeDirector : MonoBehaviour
         MakeOfficeClickable(door);
         puzzle.RegisterDoor(door.GetComponent<SpriteRenderer>());
 
-        ShowMessage("Watch the objects flash, then repeat their order. Click Watch Pattern to begin.", 3f);
     }
 
     private void MakeOfficeClickable(GameObject target)
@@ -387,7 +355,6 @@ public class PrototypeDirector : MonoBehaviour
 
     public void RestartGame()
     {
-        officeChoicePlayer = null;
         IsTransitioning = false;
         elevatorAudio.StopOfficeAmbience();
         GameState.Instance.ResetRun();
@@ -411,34 +378,6 @@ public class PrototypeDirector : MonoBehaviour
         picture.transform.localScale = Vector3.one *
             (maximumSize * 100f / Mathf.Max(texture.width, texture.height));
         return picture;
-    }
-
-    public void PresentOfficeWarning(PlayerController player)
-    {
-        if (officeChoicePlayer != null || GameState.Instance.AnsweredOfficeWarning)
-        {
-            ShowMessage(GameState.Instance.TrustedOfficeWarning
-                ? "You chose to trust the office warning."
-                : "You chose to ignore the office warning.", 3f);
-            return;
-        }
-
-        officeChoicePlayer = player;
-        officeWarningTimer = 3f;
-        player.SetMovementEnabled(false);
-        PlayClueSound();
-    }
-
-    private void ResolveOfficeWarning(bool trust)
-    {
-        if (officeChoicePlayer == null) return;
-
-        GameState.Instance.AnswerOfficeWarning(trust);
-        officeChoicePlayer.SetMovementEnabled(true);
-        officeChoicePlayer = null;
-        ShowMessage(trust
-            ? "You decide to trust the warning. The elevator may be hiding something."
-            : "You ignore the warning and focus on the office puzzle.", 3f);
     }
 
     public void ReturnFromFloor(PlayerController player, int floorNumber, Transform door)
@@ -609,20 +548,6 @@ public class PrototypeDirector : MonoBehaviour
                     : phase == RoomPhase.Hallway
                         ? "A/D / left-right: move   Mouse click / E / Space: examine"
                     : "A/D or arrows: move   E/W/Space: interact", bodyStyle);
-
-        if (officeChoicePlayer != null)
-        {
-            float left = Screen.width / 2f - 255f;
-            float top = Screen.height / 2f - 100f;
-            GUI.Box(new Rect(left, top, 510f, 200f), "OFFICE WARNING");
-            GUI.Label(new Rect(left + 30f, top + 35f, 450f, 65f),
-                "The note says: DO NOT TRUST THE ELEVATOR DISPLAY. Do you believe it?",
-                bodyStyle);
-            if (GUI.Button(new Rect(left + 30f, top + 115f, 210f, 48f), "1  Trust the warning"))
-                ResolveOfficeWarning(true);
-            if (GUI.Button(new Rect(left + 270f, top + 115f, 210f, 48f), "2  Ignore it"))
-                ResolveOfficeWarning(false);
-        }
 
     }
 }

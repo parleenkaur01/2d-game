@@ -34,16 +34,16 @@ Each solved word starts one clock. Closing the board preserves progress. Restore
 
 ### Floor 2 — The Upside-Down Office
 
-Explore an office containing six realistic, upside-down objects. Click **Watch Pattern**, or examine the paper, to begin the memory challenge.
+Explore an office containing six realistic, upside-down objects. The memory pattern begins automatically when you enter.
 
 Objects grow briefly and flash inside a yellow frame. Wait until **YOUR TURN**, then walk near and click the objects in the same order. Three rounds increase from **two flashes** to **three**, then **four**.
 
-- **Watch Again** replays the current pattern as often as needed.
+- Press **R** to replay the current pattern as often as needed.
 - A wrong click resets the current attempt, preserving completed rounds.
 - Patterns are randomized for a new run.
 - There is no time limit for repeating a pattern.
 
-Complete all three rounds to unlock the elevator and continue to Floor 3. Optional story warnings provide atmosphere; their choices do not determine whether the player escapes.
+Complete all three rounds to unlock the elevator and continue to Floor 3.
 
 ### Floor 3 — Fractured Memories
 
@@ -69,8 +69,7 @@ Progress is kept during the current run only; there is no save/load system.
 | --- | --- |
 | Elevator and Clock Room | **A/D** or **Left/Right** to move; **E**, **W**, **Up**, or **Space** to interact nearby |
 | Word-scramble board | Click tiles or type letters; **Enter** to check; **Backspace** to undo; **Esc** to return to the room |
-| Upside-Down Office | **WASD** or arrow keys to move in four directions; click nearby objects, or use **E/Space** |
-| Office warning | Click an option or press **1/2**; the popup closes after three seconds |
+| Upside-Down Office | **WASD** or arrow keys to move; click nearby objects or use **E/Space**; press **R** to replay the pattern |
 | Picture puzzle | Left-click answers in **ORIGINAL**; scroll or use zoom buttons; hold right mouse and drag to pan |
 | Restart | **Start Again** on Floor 3; **R** after a successful escape |
 

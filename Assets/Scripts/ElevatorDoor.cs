@@ -17,7 +17,8 @@ public class ElevatorDoor : Interactable
     public override string GetPrompt()
     {
         return IsUnlocked
-            ? "Return to the elevator" : "The elevator is locked";
+            ? "Return to the elevator"
+            : floorNumber == 1 ? "Solve the word scrambles first" : "Complete the memory pattern first";
     }
 
     public override void Interact(PlayerController player)
@@ -26,7 +27,7 @@ public class ElevatorDoor : Interactable
         {
             director.ShowMessage(floorNumber == 1
                 ? "The door is locked. Solve the three word scrambles to restore the clocks."
-                : "The door is locked. Complete the three memory rounds first.", 4f);
+                : "Complete the three memory rounds to open the elevator.", 4f);
             return;
         }
 

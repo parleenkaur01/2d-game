@@ -7,7 +7,6 @@ public class OfficePuzzle : MonoBehaviour
     private readonly OfficeButton[] buttons = new OfficeButton[6];
     private MemoryPatternState memory;
     private PrototypeDirector director;
-    private Transform warning;
     private SpriteRenderer door;
     private GUIStyle labelStyle;
     private bool showing;
@@ -15,11 +14,15 @@ public class OfficePuzzle : MonoBehaviour
     private int flashing = -1;
     private int flashStep;
 
-    public void Configure(PrototypeDirector owner, Transform warningObject)
+    public void Configure(PrototypeDirector owner)
     {
         director = owner;
-        warning = warningObject;
         memory = MemoryPatternState.CreateRandom();
+    }
+
+    public void BeginChallenge()
+    {
+        StartCoroutine(ShowPattern(0.9f));
     }
 
     public void RegisterButton(int index, OfficeButton button) => buttons[index] = button;
@@ -28,8 +31,12 @@ public class OfficePuzzle : MonoBehaviour
     public void RevealHint()
     {
         if (showing || memory.Solved) return;
-        GameState.Instance.InspectOfficeClue();
         StartCoroutine(ShowPattern(0.5f));
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R)) RevealHint();
     }
 
     private IEnumerator ShowPattern(float delay)
@@ -99,21 +106,18 @@ public class OfficePuzzle : MonoBehaviour
     {
         if (memory == null) return;
         if (labelStyle == null)
-            labelStyle = new GUIStyle(GUI.skin.box)
-                { fontSize = 16, alignment = TextAnchor.MiddleCenter, wordWrap = true };
+            labelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 16,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = new Color(0.88f, 0.94f, 0.88f) }
+            };
 
         string status = memory.Solved ? "Memory challenge complete!"
             : showing ? "WATCH • Round " + (memory.Round + 1) + "/3 • Flash " + flashStep + "/" + memory.CurrentPattern.Length
-            : ready ? "YOUR TURN • Round " + (memory.Round + 1) + "/3 • Repeat " + memory.CurrentPattern.Length + " objects"
-            : "Watch the objects flash, then repeat the pattern";
-        GUI.Box(new Rect(20f, 100f, Screen.width - 220f, 38f), status, labelStyle);
-        if (!memory.Solved)
-        {
-            bool oldEnabled = GUI.enabled;
-            GUI.enabled = oldEnabled && !showing;
-            if (GUI.Button(new Rect(Screen.width - 185f, 100f, 165f, 38f), ready ? "Watch Again" : "Watch Pattern")) RevealHint();
-            GUI.enabled = oldEnabled;
-        }
+            : ready ? "YOUR TURN • Round " + (memory.Round + 1) + "/3 • Repeat " + memory.CurrentPattern.Length + " objects • R to replay"
+            : "Watch the objects flash, then click them in the same order • R to replay";
+        GUI.Label(new Rect(20f, 88f, Screen.width - 40f, 30f), status, labelStyle);
 
         if (flashing >= 0)
         {
@@ -130,13 +134,7 @@ public class OfficePuzzle : MonoBehaviour
             GUI.DrawTexture(new Rect(frame.xMax - 4f, frame.y, 4f, frame.height), Texture2D.whiteTexture);
             GUI.color = old;
         }
-        if (warning != null) DrawLabel(warning.position + Vector3.up * 0.8f, "WARNING");
-        if (door != null) DrawLabel(door.transform.position + Vector3.up * 2.4f, memory.Solved ? "OPEN" : "LOCKED");
-    }
-
-    private void DrawLabel(Vector3 position, string text)
-    {
-        Vector3 point = Camera.main.WorldToScreenPoint(position);
-        GUI.Box(new Rect(point.x - 55f, Screen.height - point.y - 16f, 110f, 32f), text, labelStyle);
+        if (memory.Solved && door != null)
+            door.color = new Color(0.28f, 0.62f, 0.44f);
     }
 }
