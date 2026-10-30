@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Creates the elevator and floor sounds at runtime so the prototype has audio
-/// without depending on uncredited external files.
-/// </summary>
 public class ElevatorAudio : MonoBehaviour
 {
     private AudioSource source;

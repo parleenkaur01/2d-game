@@ -1,6 +1,5 @@
 using UnityEngine;
 
-/// <summary>The illuminated button that starts an elevator ride.</summary>
 public class ElevatorButton : Interactable
 {
     private PrototypeDirector director;

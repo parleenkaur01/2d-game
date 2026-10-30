@@ -1,6 +1,5 @@
 using UnityEngine;
 
-/// <summary>Stores the small amount of state that must survive room transitions.</summary>
 public class GameState : MonoBehaviour
 {
     public static GameState Instance { get; private set; }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>Letter-tile rules, independent of the room and interface.</summary>
 public class WordScrambleState
 {
     private static readonly string[] Words = { "TIME", "FLOOR", "ESCAPE" };

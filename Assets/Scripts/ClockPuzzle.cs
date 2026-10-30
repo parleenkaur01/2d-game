@@ -1,6 +1,5 @@
 using UnityEngine;
 
-/// <summary>Three word scrambles restore the clocks and unlock the elevator.</summary>
 public class ClockPuzzle : MonoBehaviour
 {
     private WordScrambleState words;

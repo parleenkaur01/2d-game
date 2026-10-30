@@ -1,6 +1,5 @@
 using UnityEngine;
 
-/// <summary>The letter board that opens Floor 1's word puzzle.</summary>
 public class ClockClue : Interactable
 {
     private PrototypeDirector director;

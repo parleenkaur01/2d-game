@@ -1,10 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Builds the elevator, three floors, and the final completion screen.
-/// Authored scenes and artwork can replace these generated rooms later.
-/// </summary>
 public class PrototypeDirector : MonoBehaviour
 {
     private enum RoomPhase
@@ -96,8 +92,6 @@ public class PrototypeDirector : MonoBehaviour
         CreateBlock("Right Wall", new Vector2(4.35f, 0f), new Vector2(0.35f, 7f),
             new Color(0.23f, 0.24f, 0.28f), -3);
 
-        // This blue opening is hidden while the doors are closed and becomes
-        // visible as they slide apart at the destination.
         CreateBlock("Arrival Opening", new Vector2(0f, -0.1f), new Vector2(4.6f, 5.7f),
             new Color(0.035f, 0.08f, 0.14f), -7, false);
         leftElevatorDoor = CreateBlock("Left Door", new Vector2(-1.18f, -0.1f),
@@ -316,7 +310,6 @@ public class PrototypeDirector : MonoBehaviour
             OfficeButton officeButton = button.AddComponent<OfficeButton>();
             officeButton.Configure(puzzle, i);
             MakeOfficeClickable(button);
-            // Thin items such as the pen get a comfortable mouse target.
             BoxCollider2D clickArea = button.GetComponent<BoxCollider2D>();
             Vector2 clickSize = clickArea.size;
             clickSize.x = Mathf.Max(clickSize.x, 0.65f / button.transform.localScale.x);
@@ -415,7 +408,6 @@ public class PrototypeDirector : MonoBehaviour
     {
         if (roomRoot != null)
         {
-            // Stop the previous room's camera and input logic immediately.
             roomRoot.SetActive(false);
             Destroy(roomRoot);
         }

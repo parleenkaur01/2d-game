@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>Watch real office objects flash, then repeat increasingly long patterns.</summary>
 public class OfficePuzzle : MonoBehaviour
 {
     private readonly OfficeButton[] buttons = new OfficeButton[6];

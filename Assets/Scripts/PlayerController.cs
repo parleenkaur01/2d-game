@@ -1,12 +1,9 @@
 using UnityEngine;
 
-/// <summary>Small side-view controller for the first prototype slice.</summary>
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
-    // Interactable controls are mounted on the elevator wall above the player.
-    // This range lets the player reach them without requiring vertical movement.
     [SerializeField] private float interactionDistance = 2.8f;
     private Rigidbody2D body;
     private Interactable nearbyInteractable;

@@ -2,7 +2,6 @@ using UnityEngine;
 
 public enum MemoryResult { Wrong, Accepted, RoundComplete, Solved }
 
-/// <summary>Memory rounds retain finished rounds when an attempt goes wrong.</summary>
 public class MemoryPatternState
 {
     private readonly int[][] patterns;

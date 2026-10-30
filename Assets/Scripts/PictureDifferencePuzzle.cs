@@ -2,7 +2,6 @@ using UnityEngine;
 
 public enum DifferenceResult { Found, AlreadyFound, Miss }
 
-/// <summary>Tracks unique finds with forgiving click targets and no guessing penalty.</summary>
 public class PictureDifferenceState
 {
     private readonly Rect[] answers;
@@ -37,10 +36,9 @@ public class PictureDifferenceState
     }
 }
 
-/// <summary>Two-image comparison. Answer coordinates use the original image's top-left origin.</summary>
 public class PictureDifferencePuzzle : MonoBehaviour
 {
-    // Calibrated to the final reference artwork, not the screen's resolution.
+    // Coordinates match the source image.
     public static readonly Rect[] AnswerRegions = {
         new Rect(188f / 1536f, 778f / 1024f, 104f / 1536f, 54f / 1024f),
         new Rect(1364f / 1536f, 306f / 1024f, 65f / 1536f, 52f / 1024f),
@@ -188,9 +186,7 @@ public class PictureDifferencePuzzle : MonoBehaviour
 
     private void DrawAlteredPatches(Rect panel)
     {
-        // Use the generated removal areas only. Every other displayed pixel comes
-        // from the original, preventing incidental generative texture drift from
-        // becoming additional, unclickable differences.
+        // Only show the three intended changes over the original image.
         GUI.BeginGroup(panel);
         foreach (Rect region in AnswerRegions)
         {

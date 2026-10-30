@@ -1,6 +1,5 @@
 using UnityEngine;
 
-/// <summary>Character artwork and lightweight visual motion, separate from the physics body.</summary>
 public class PlayerAvatar : MonoBehaviour
 {
     private Rigidbody2D body;
