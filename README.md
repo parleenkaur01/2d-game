@@ -89,9 +89,3 @@ Progress is kept during the current run only; there is no save/load system.
 | `Assets/Scripts/PictureDifferencePuzzle.cs` | Floor 3 images, zoom, hints, and answer selection |
 | `Assets/Scripts/GameState.cs` | Puzzle progress for the current run |
 | `Assets/Resources/` | Runtime-loaded artwork and asset notes |
-
-## Current status
-
-The prototype implements the opening elevator, miniature player with footsteps, all three puzzle floors, escape success, and restart. Development checks have covered Unity compilation, player presentation, word-tile rules, memory-round recovery, image loading and click mapping, completion gating, and resetting progress.
-
-Remaining work includes a full manual playthrough, visual and audio polish, a pause menu, standalone build verification, gameplay recording, and submission documentation. No standalone build is included. Add `Main.unity` to the build's scene list before creating one.
