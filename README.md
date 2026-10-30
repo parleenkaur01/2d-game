@@ -21,7 +21,7 @@ The rooms and interface are created at runtime. An empty scene before pressing P
 
 Start in a dark elevator at B3. Follow the opening instruction: **Move right to the glowing button, then press E or Space.** The elevator moves with motor audio, vibration, changing floor numbers, a bell, and sliding doors.
 
-### Floor 1 — The Clock Room
+### Floor 1: The Clock Room
 
 Open the letter board on the left, or interact with one of the stopped clocks. Solve three word scrambles using each round's riddle:
 
@@ -32,7 +32,7 @@ Open the letter board on the left, or interact with one of the stopped clocks. S
 
 Each solved word starts one clock. Closing the board preserves progress. Restore all three clocks, return to the room, and use the green elevator door. Press the glowing elevator button to continue.
 
-### Floor 2 — The Upside-Down Office
+### Floor 2: The Upside-Down Office
 
 Explore an office containing six realistic, upside-down objects. The memory pattern begins automatically when you enter.
 
@@ -47,7 +47,7 @@ Complete all three rounds to unlock the elevator and continue to Floor 3.
 
 The Floor 2 screen keeps the puzzle area clear: there is no warning popup, clue board, or large locked label. The exit door changes to green when the memory challenge is complete.
 
-### Floor 3 — Fractured Memories
+### Floor 3: Fractured Memories
 
 Compare the **ORIGINAL** picture with its altered copy. Three objects are missing from the altered picture. Find them by clicking their locations in **ORIGINAL**; the instructions do not name the answers.
 
@@ -59,7 +59,7 @@ Compare the **ORIGINAL** picture with its altered copy. Three objects are missin
 
 ## Escape and restart
 
-Find all three differences on Floor 3 to see **ESCAPE SUCCESSFUL — You successfully escaped!** The pictures remain visible with the confirmed differences marked. There is no additional exit choice.
+Find all three differences on Floor 3 to see **ESCAPE SUCCESSFUL: You successfully escaped!** The pictures remain visible with the confirmed differences marked. There is no additional exit choice.
 
 While Floor 3 is unfinished, the player is **still trapped**. Keep trying, use hints, or click **Start Again** to return to the opening elevator. Starting again clears progress on every floor. After escaping, **Start Again** or **R** begins a fresh run.
 
