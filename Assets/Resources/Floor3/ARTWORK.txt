@@ -1,5 +1,4 @@
 Floor 3 image-pair artwork
-Created with built-in image_gen: original illustration plus a targeted three-object removal edit.
 Files: reference.png and changed.png, both 1536x1024.
 The game draws the original in both panels and overlays only the three edited removal patches in the altered panel. This preserves identical surrounding pixels and exactly three playable differences.
 

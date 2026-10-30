@@ -1,5 +1,4 @@
 Mini player character
-Created with the built-in image_gen tool as an original AI-generated transparent game sprite.
 File: avatar.png
 The runtime PlayerAvatar component scales the image to a miniature character, anchors it at the feet, flips left/right, and adds a walking bob and idle breathing. Physics stays on the separate player root.
 
