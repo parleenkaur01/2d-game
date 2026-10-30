@@ -131,7 +131,7 @@ public class PrototypeDirector : MonoBehaviour
 
         CreatePlayer(new Vector2(completedFloor == 0 ? -1.6f : 0f, -2.2f), 2.8f);
         ShowMessage(completedFloor == 0
-            ? "The elevator is silent. One button is still glowing."
+            ? "Move right to the glowing button, then press E or Space."
             : completedFloor == 1
                 ? "Floor 1 complete. Press the glowing button for Floor 2."
                 : "Floor 2 complete. Press the glowing button for Floor 3.", 6f);
