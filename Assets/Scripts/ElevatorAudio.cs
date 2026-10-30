@@ -18,6 +18,7 @@ public class ElevatorAudio : MonoBehaviour
 
     private void Awake()
     {
+        // Generate simple sounds so the project does not need audio files.
         source = gameObject.AddComponent<AudioSource>();
         source.playOnAwake = false;
         source.spatialBlend = 0f;

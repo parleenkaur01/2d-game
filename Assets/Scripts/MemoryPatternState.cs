@@ -18,6 +18,7 @@ public class MemoryPatternState
         for (int round = 0; round < sequences.Length; round++)
         {
             int[] objects = { 0, 1, 2, 3, 4, 5 };
+            // Shuffle all objects before choosing this round's pattern.
             for (int i = objects.Length - 1; i > 0; i--)
             {
                 int j = Random.Range(0, i + 1);

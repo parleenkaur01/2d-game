@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
+    // Extra reach is needed for buttons mounted above the player.
     [SerializeField] private float interactionDistance = 2.8f;
     private Rigidbody2D body;
     private Interactable nearbyInteractable;

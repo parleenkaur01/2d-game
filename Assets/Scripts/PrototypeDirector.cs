@@ -408,6 +408,7 @@ public class PrototypeDirector : MonoBehaviour
     {
         if (roomRoot != null)
         {
+            // Destroy happens at the end of the frame, so hide the old room first.
             roomRoot.SetActive(false);
             Destroy(roomRoot);
         }

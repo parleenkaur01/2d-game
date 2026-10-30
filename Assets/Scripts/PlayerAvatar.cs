@@ -36,6 +36,7 @@ public class PlayerAvatar : MonoBehaviour
 
         float bounce = walking ? Mathf.Abs(Mathf.Sin(stepPhase)) * 0.045f : 0f;
         float breathing = walking ? 1f : 1f + Mathf.Sin(Time.time * 2f) * 0.012f;
+        // Move the artwork instead of the player collider.
         visual.localPosition = footPosition + Vector3.up * bounce;
         visual.localRotation = Quaternion.Euler(0f, 0f, walking ? Mathf.Sin(stepPhase) * 1.5f : 0f);
         visual.localScale = new Vector3(artworkScale, artworkScale * breathing, artworkScale);
