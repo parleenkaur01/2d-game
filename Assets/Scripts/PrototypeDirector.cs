@@ -144,10 +144,6 @@ public class PrototypeDirector : MonoBehaviour
                 new Vector2(0.38f, 0.38f), new Color(0.22f, 0.45f, 0.33f), 1, false);
         }
 
-        GameObject warning = CreateBlock("Scratched Warning", new Vector2(-3.1f, 0.1f),
-            new Vector2(0.85f, 0.62f), new Color(0.72f, 0.68f, 0.52f), 1);
-        warning.AddComponent<ElevatorWarning>().Configure(this);
-
         CreatePlayer(new Vector2(completedFloor == 0 ? -1.6f : 0f, -2.2f), 2.8f);
         ShowMessage(completedFloor == 0
             ? "The elevator is silent. One button is still glowing."
@@ -489,10 +485,13 @@ public class PrototypeDirector : MonoBehaviour
 
     private PlayerController CreatePlayer(Vector2 position, float interactionRange)
     {
-        GameObject playerObject = CreateBlock("Player", position, new Vector2(0.8f, 1.5f),
-            new Color(0.8f, 0.75f, 0.55f), 10);
+        GameObject playerObject = new GameObject("Player");
+        playerObject.transform.SetParent(roomRoot.transform, false);
+        playerObject.transform.localPosition = position;
+        playerObject.AddComponent<BoxCollider2D>().size = new Vector2(0.8f, 1.5f);
         PlayerController controller = playerObject.AddComponent<PlayerController>();
         controller.SetInteractionDistance(interactionRange);
+        playerObject.AddComponent<PlayerAvatar>().Configure();
         return controller;
     }
 

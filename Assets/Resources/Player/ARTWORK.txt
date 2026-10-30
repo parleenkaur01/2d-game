@@ -1,0 +1,7 @@
+Mini player character
+Created with the built-in image_gen tool as an original AI-generated transparent game sprite.
+File: avatar.png
+The runtime PlayerAvatar component scales the image to a miniature character, anchors it at the feet, flips left/right, and adds a walking bob and idle breathing. Physics stays on the separate player root.
+
+Final prompt:
+Use case: stylized-concept. Asset type: single transparent 2D playable character sprite for a small mysterious elevator puzzle adventure. One miniature human explorer, friendly young adult with slightly oversized head and short dark hair, warm mustard jacket over a cream shirt, dark blue trousers and brown shoes. Full body visible from head to both feet, three-quarter side view facing RIGHT, relaxed neutral standing pose with feet slightly apart and arms naturally at sides. Simple polished hand-painted game illustration with clear readable silhouette, gentle light outline to remain visible on dark blue and green rooms, compact chibi proportions around three heads tall. Centered character fills about 90 percent of vertical frame; feet are five percent above the bottom edge. Genuinely transparent background, crisp cutout edges, no floor, no environment, no cast shadow outside character, no text, no logo, no props or extra characters, no sprite sheet. It should read clearly when shown only 70 pixels tall.

@@ -4,6 +4,8 @@ A small Unity 2D puzzle adventure by **Parleen Kaur**. Escape a mysterious eleva
 
 The focus is exploration, observation, and approachable puzzles. There is no combat or time limit.
 
+The player is a miniature explorer character with a walking bob, subtle idle breathing, and left/right facing. The character appears in the elevator and both explorable rooms.
+
 ## Run the game
 
 1. Install **Unity 6000.6.2f1** (Unity 6.6) through Unity Hub.
@@ -17,7 +19,7 @@ The rooms and interface are created at runtime. An empty scene before pressing P
 
 ### Opening elevator
 
-Start in a dark elevator at B3. Examine the note or walk to the glowing button on the right and interact. The elevator travels upward with motor audio, vibration, changing floor numbers, a bell, and sliding doors.
+Start in a dark elevator at B3. Walk to the glowing button on the right and interact to travel upward. The elevator moves with motor audio, vibration, changing floor numbers, a bell, and sliding doors.
 
 ### Floor 1 — The Clock Room
 
@@ -79,6 +81,7 @@ Progress is kept during the current run only; there is no save/load system.
 Rooms use simple geometry alongside AI-generated artwork. Sound effects are synthesized at runtime, including elevator movement, button clicks, doors, bells, clock ticking, electrical ambience, and puzzle feedback. A short descending two-note buzz plays for an incorrect word, a wrong memory-pattern choice, or a wrong click in the picture puzzle. There is no continuous background music.
 
 - [Office artwork and generation prompts](Assets/Resources/Office/ARTWORK.txt): key, table, pen, chair, notebook, and lamp cutouts.
+- [Player artwork and generation prompt](Assets/Resources/Player/ARTWORK.txt): the transparent miniature explorer sprite.
 - [Floor 3 artwork and generation prompts](Assets/Resources/Floor3/ARTWORK.txt): the reference illustration and its targeted removal edit. The game displays only the three edited patches over the original so incidental texture variations do not create extra differences.
 
 ## Project structure
